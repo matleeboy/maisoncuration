@@ -15,6 +15,7 @@ const defaultArchive = {
           {
             name: "Black Gran Sasso Polo",
             brand: "Gran Sasso",
+            price: "$350",
             url: "",
             image:
               "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=600&auto=format&fit=crop",
@@ -25,6 +26,7 @@ const defaultArchive = {
           {
             name: "Plaid Wool Jacket",
             brand: "Massimo Dutti",
+            price: "$450",
             url: "",
             image:
               "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=600&auto=format&fit=crop",
@@ -38,6 +40,7 @@ const defaultArchive = {
           {
             name: "Tom Ford Private Blend",
             brand: "Tom Ford",
+            price: "$310",
             url: "",
             image:
               "https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600&auto=format&fit=crop",
@@ -48,6 +51,7 @@ const defaultArchive = {
           {
             name: "Charcoal Grey Quarter-Zip",
             brand: "Isaia",
+            price: "$520",
             url: "",
             image:
               "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&auto=format&fit=crop",
@@ -58,6 +62,7 @@ const defaultArchive = {
           {
             name: "Suede-Yoke Puffer Vest",
             brand: "Brunello Cucinelli",
+            price: "$1,800",
             url: "",
             image:
               "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=600&auto=format&fit=crop",
@@ -68,6 +73,7 @@ const defaultArchive = {
           {
             name: "Vintage Driver Sunglasses",
             brand: "Persol",
+            price: "$320",
             url: "",
             image:
               "https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=600&auto=format&fit=crop",
@@ -86,6 +92,7 @@ const defaultArchive = {
           {
             name: "Ribbed Knit Blazer",
             brand: "Gran Sasso",
+            price: "$420",
             url: "",
             image:
               "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=600&auto=format&fit=crop",
@@ -97,6 +104,7 @@ const defaultArchive = {
           {
             name: "Ojai Eau de Parfum",
             brand: "L'Objet",
+            price: "$195",
             url: "",
             image:
               "https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600&auto=format&fit=crop",
@@ -109,6 +117,7 @@ const defaultArchive = {
           {
             name: "Rose Noire de Parfum",
             brand: "L'Objet",
+            price: "$225",
             url: "",
             image:
               "https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600&auto=format&fit=crop",
@@ -132,6 +141,7 @@ const defaultArchive = {
           {
             name: "Custom Travel Map Placemats",
             brand: "Custom",
+            price: "",
             url: "",
             image:
               "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=600&auto=format&fit=crop",
@@ -147,6 +157,7 @@ const defaultArchive = {
       brand: "Architectural Millwork",
       room: "Master Suite",
       category: "bedroom",
+      price: "$8,500",
       url: "",
       image:
         "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop",
@@ -424,7 +435,9 @@ function renderProfileItems() {
       <div class="card-body">
         <div>
           <h4>${item.name}</h4>
-          <div class="product-meta">${item.brand}</div>
+          <div class="product-meta">
+            ${item.brand}${item.price ? ` • ${item.price}` : ""}
+          </div>
           <div class="tags-container">${tagsHtml}</div>
         </div>
         <div class="card-footer-actions">
@@ -485,7 +498,11 @@ function renderFurniture() {
       <div class="card-body">
         <div>
           <h4>${item.name}</h4>
-          <div class="product-meta">${item.brand} • Room: ${item.room || ''}</div>
+          <div class="product-meta">
+            ${item.brand} • Room: ${item.room || ''}${
+      item.price ? ` • ${item.price}` : ""
+    }
+          </div>
           <div class="tags-container">${tagsHtml}</div>
         </div>
         <div class="card-footer-actions">
@@ -517,12 +534,14 @@ function handleAddItem(event) {
   const category = document.getElementById("itemCategory").value;
   const name = document.getElementById("itemName").value;
   const brand = document.getElementById("itemBrand").value;
+  const priceEl = document.getElementById("itemPrice");
+  const price = priceEl ? priceEl.value.trim() : "";
   const url = document.getElementById("itemUrl").value;
   const image =
     document.getElementById("itemImg").value ||
     "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=600&auto=format&fit=crop";
 
-  const newItem = { name, brand, url, image, tags: [brand] };
+  const newItem = { name, brand, price, url, image, tags: [brand] };
   archiveData.profiles[currentProfile].categories[category].push(newItem);
   saveArchive();
   renderProfileItems();
@@ -536,6 +555,8 @@ function handleAddFurniture(event) {
   const name = document.getElementById("furnName").value;
   const brand = document.getElementById("furnMaker").value;
   const room = document.getElementById("furnRoom").value;
+  const priceEl = document.getElementById("furnPrice");
+  const price = priceEl ? priceEl.value.trim() : "";
   const category = document.getElementById("furnCategory").value;
   const url = document.getElementById("furnUrl").value;
   const image =
@@ -546,6 +567,7 @@ function handleAddFurniture(event) {
     name,
     brand,
     room,
+    price,
     category,
     url,
     image,
