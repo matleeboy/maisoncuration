@@ -8,17 +8,16 @@ export default async function handler(req, res) {
       return;
     }
 
-    const url = req.query.url;
-    if (!url) {
+    const urlParam = req.query.url;
+    if (!urlParam) {
       res.status(400).json({ error: 'Missing url parameter' });
       return;
     }
 
     let targetUrl;
     try {
-      targetUrl = decodeURIComponent(url);
-      // Validate URL
-      new URL(targetUrl);
+      targetUrl = decodeURIComponent(urlParam);
+      new URL(targetUrl); // validate URL
     } catch {
       res.status(400).json({ error: 'Invalid url parameter' });
       return;
@@ -44,7 +43,6 @@ export default async function handler(req, res) {
 
     const html = await response.text();
 
-    // If the content is not HTML, bail early
     if (!html || !html.includes('<html')) {
       res.status(500).json({ error: 'Fetched content is not HTML' });
       return;
@@ -73,6 +71,7 @@ export default async function handler(req, res) {
     const ogTitle = getMetaContent('og:title');
     const twitterTitle = getMetaContent('twitter:title');
     const titleTag = getTitleTag();
+
     const ogImage = getMetaContent('og:image');
     const twitterImage = getMetaContent('twitter:image');
 
@@ -97,7 +96,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Derive brand from hostname if we didn't find one
     if (!brand) {
       const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
       brand = hostname.split('.')[0] || 'Brand';
@@ -107,24 +105,33 @@ export default async function handler(req, res) {
     name = name.replace(/[\|\-–—].+$/, '').trim();
     if (!name || name.length < 3) name = rawTitle;
 
+    // Choose main image
     let image = ogImage || twitterImage || '';
+
+    // If relative path, make absolute
     if (image && image.startsWith('/')) {
       const base = new URL(targetUrl);
       image = `${base.protocol}//${base.host}${image}`;
     }
 
-    const screenshot =
+    // Always prepare a screenshot URL as a reliable fallback
+    const screenshotUrl =
       `https://api.microlink.io/?url=${encodeURIComponent(
         targetUrl
       )}&screenshot=true&embed=screenshot.url`;
+
+    // If no OG/Twitter image, use screenshot as "image"
+    if (!image) {
+      image = screenshotUrl;
+    }
 
     const result = {
       url: targetUrl,
       title: rawTitle,
       brand,
       name,
-      image: image || screenshot,
-      screenshotUrl: screenshot,
+      image,
+      screenshotUrl,
     };
 
     res.setHeader('Cache-Control', 'max-age=3600');
