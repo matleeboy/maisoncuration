@@ -11,7 +11,7 @@
       --card-border: #232730;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --accent: #c5a880; /* Refined luxury champagne gold */
+      --accent: #c5a880;
       --accent-hover: #d8bc94;
       --input-bg: #1a1d24;
       --radius: 8px;
@@ -26,7 +26,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Login Screen Overlay */
     #login-screen {
       position: fixed;
       top: 0;
@@ -96,7 +95,6 @@
       cursor: pointer;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      transition: background 0.2s;
     }
 
     .login-card button:hover {
@@ -110,12 +108,10 @@
       display: none;
     }
 
-    /* Main App Container */
     #app-content {
       display: none;
     }
 
-    /* Shopify-style Header / Navigation */
     header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--card-border);
@@ -135,7 +131,6 @@
       text-transform: uppercase;
       color: var(--accent);
       cursor: pointer;
-      text-decoration: none;
     }
 
     .nav-links {
@@ -166,7 +161,6 @@
       padding: 3rem 2rem;
     }
 
-    /* Views System */
     .view {
       display: none;
     }
@@ -174,7 +168,6 @@
       display: block;
     }
 
-    /* Hero Banner for Home */
     .hero-banner {
       text-align: center;
       padding: 4rem 1rem 5rem 1rem;
@@ -196,7 +189,6 @@
       line-height: 1.6;
     }
 
-    /* Shopify Collection Grid (Home Profiles) */
     .collection-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -253,7 +245,6 @@
       font-weight: 500;
     }
 
-    /* Profile View Sub-Navigation Tabs */
     .profile-header {
       display: flex;
       justify-content: space-between;
@@ -298,7 +289,6 @@
       border-color: var(--accent);
     }
 
-    /* Product Grid & Cards */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -313,11 +303,6 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: border-color 0.2s;
-    }
-
-    .product-card:hover {
-      border-color: #3a3f4c;
     }
 
     .product-card h4 {
@@ -349,7 +334,6 @@
       border-radius: 4px;
       color: var(--text-muted);
       border: 1px solid var(--card-border);
-      letter-spacing: 0.03em;
     }
 
     .product-link {
@@ -366,7 +350,6 @@
       text-decoration: underline;
     }
 
-    /* Add Item Modal / Form Section */
     .add-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -432,17 +415,10 @@
       font-size: 0.85rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      transition: background 0.2s;
     }
 
     .btn-primary:hover {
       background: var(--accent-hover);
-    }
-
-    @media (max-width: 768px) {
-      header { padding: 1rem; }
-      .container { padding: 1.5rem 1rem; }
-      .hero-banner h1 { font-size: 2rem; }
     }
   </style>
 </head>
@@ -515,7 +491,6 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
-        <!-- Add Item Form with Smart Recognition -->
         <div class="add-section">
           <h3>Add Item to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
@@ -605,9 +580,7 @@
           categories: {
             shirts: [{ name: "Black Gran Sasso Polo", brand: "Gran Sasso", url: "", tags: ["100% Merino"] }],
             jackets: [{ name: "Plaid Wool Jacket", brand: "Massimo Dutti", url: "", tags: ["Wool"] }],
-            pants: [],
-            blazers: [],
-            shoes: [],
+            pants: [], blazers: [], shoes: [],
             fragrance: [{ name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather"] }],
             sweaters: [{ name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit"] }],
             watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Outerwear"] }],
@@ -716,7 +689,6 @@
       document.getElementById('view-profile').classList.add('active');
     }
 
-    // Smart Auto-Categorization Engine based on text and URL keywords
     function smartAutoDetect() {
       const name = document.getElementById('itemName').value.toLowerCase();
       const url = document.getElementById('itemUrl').value.toLowerCase();
@@ -733,4 +705,101 @@
       else if (/shoe|boot|loafer|sneaker|footwear|oxford|ghillie/i.test(combined)) detected = 'shoes';
       else if (/fragrance|perfume|cologne|scent|eau|parfum|edp|edt/i.test(combined)) detected = 'fragrance';
       else if (/sweater|knit|cardigan|pullover|quarter-zip|cashmere/i.test(combined)) detected = 'sweaters';
-      else if (/watch|belt|bag
+      else if (/watch|belt|bag|accessory|sunglasses|wallet|scarf|tie/i.test(combined)) detected = 'watches';
+      else if (/gift|present|wishlist|idea/i.test(combined)) detected = 'gifts';
+
+      if (detected) {
+        select.value = detected;
+        notice.innerText = `✨ Auto-detected category: ${detected.toUpperCase()}`;
+      } else {
+        notice.innerText = `✨ Smart-categorizing based on text & URL`;
+      }
+    }
+
+    function renderProfileItems() {
+      const grid = document.getElementById('profile-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderFurniture() {
+      const grid = document.getElementById('furniture-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.furniture || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function handleAddItem(event) {
+      event.preventDefault();
+      const category = document.getElementById('itemCategory').value;
+      const name = document.getElementById('itemName').value;
+      const brand = document.getElementById('itemBrand').value;
+      const url = document.getElementById('itemUrl').value;
+
+      const newItem = { name, brand, url, tags: [brand] };
+      archiveData.profiles[currentProfile].categories[category].push(newItem);
+      saveArchive();
+      renderProfileItems();
+      document.getElementById('addItemForm').reset();
+      document.getElementById('autoNotice').innerText = `✨ Smart-categorizing based on text & URL`;
+    }
+
+    function handleAddFurniture(event) {
+      event.preventDefault();
+      const name = document.getElementById('furnName').value;
+      const brand = document.getElementById('furnMaker').value;
+      const room = document.getElementById('furnRoom').value;
+      const url = document.getElementById('furnUrl').value;
+
+      const newFurn = { name, brand, room, url, tags: [room] };
+      archiveData.furniture.push(newFurn);
+      saveArchive();
+      renderFurniture();
+      document.getElementById('addFurnitureForm').reset();
+    }
+  </script>
+</body>
+</html>
