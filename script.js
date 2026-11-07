@@ -1,7 +1,10 @@
+// Point this to your Vercel project API
 const API_BASE = 'https://maisoncuration.vercel.app/api';
+
 const FAMILY_PASSPHRASE = "Porsche";
 let currentProfile = 'mat';
 let currentCategory = 'shirts';
+let currentHomeCategory = 'all';
 
 const defaultArchive = {
   profiles: {
@@ -143,6 +146,7 @@ const defaultArchive = {
       name: "Custom Built-in Closets",
       brand: "Architectural Millwork",
       room: "Master Suite",
+      category: "bedroom",
       url: "",
       image:
         "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop",
@@ -157,6 +161,8 @@ let archiveData =
 function saveArchive() {
   localStorage.setItem("maisonArchive", JSON.stringify(archiveData));
 }
+
+/* LOGIN */
 
 function handleLogin(event) {
   event.preventDefault();
@@ -188,6 +194,8 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+/* VIEW SWITCHING */
+
 function switchView(viewName) {
   document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
@@ -202,9 +210,12 @@ function switchView(viewName) {
     document
       .querySelector('.nav-btn[onclick*="home-furniture"]')
       ?.classList.add("active");
+    setupHomeSubTabs();
     renderFurniture();
   }
 }
+
+/* PROFILE OPENING */
 
 function openProfile(profileKey) {
   currentProfile = profileKey;
@@ -248,7 +259,47 @@ function openProfile(profileKey) {
   document.getElementById("view-profile").classList.add("active");
 }
 
-// --- SMART EXTRACT VIA VERCEL API ---
+/* HOME SUB-TABS (FOREVER HOME) */
+
+function setupHomeSubTabs() {
+  const categories = [
+    { key: 'all', label: 'All' },
+    { key: 'furniture', label: 'Furniture' },
+    { key: 'fixtures', label: 'Fixtures' },
+    { key: 'lights', label: 'Lights' },
+    { key: 'tiles', label: 'Tiles' },
+    { key: 'kitchen', label: 'Kitchen' },
+    { key: 'living-room', label: 'Living Room' },
+    { key: 'bathroom', label: 'Bathroom' },
+    { key: 'bedroom', label: 'Bedroom' },
+    { key: 'yard', label: 'Yard' },
+    { key: 'garage', label: 'Garage' },
+    { key: 'gym', label: 'Gym' },
+  ];
+
+  const container = document.getElementById('home-sub-tabs');
+  if (!container) return;
+
+  container.innerHTML = '';
+  categories.forEach((cat, index) => {
+    const btn = document.createElement('button');
+    btn.className = `sub-tab-btn ${index === 0 ? 'active' : ''}`;
+    btn.innerText = cat.label;
+    btn.onclick = () => {
+      document
+        .querySelectorAll('#home-sub-tabs .sub-tab-btn')
+        .forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentHomeCategory = cat.key;
+      renderFurniture();
+    };
+    container.appendChild(btn);
+  });
+
+  currentHomeCategory = 'all';
+}
+
+/* SMART EXTRACT (APPAREL) */
 
 async function smartExtractFromLink() {
   const urlInputEl = document.getElementById("itemUrl");
@@ -302,6 +353,8 @@ async function smartExtractFromLink() {
   }
 }
 
+/* SMART EXTRACT (FURNITURE – heuristic only) */
+
 function smartExtractFurniture() {
   const urlInput = document.getElementById("furnUrl").value.trim();
   if (!urlInput) return;
@@ -342,6 +395,8 @@ function smartExtractFurniture() {
   }
 }
 
+/* RENDERING – PROFILE */
+
 function renderProfileItems() {
   const grid = document.getElementById("profile-product-grid");
   grid.innerHTML = "";
@@ -349,7 +404,8 @@ function renderProfileItems() {
     archiveData.profiles[currentProfile].categories[currentCategory] || [];
 
   if (items.length === 0) {
-    grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
+    grid.innerHTML =
+      `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
     return;
   }
 
@@ -392,13 +448,25 @@ function deleteProfileItem(index) {
   }
 }
 
+/* RENDERING – FOREVER HOME */
+
 function renderFurniture() {
   const grid = document.getElementById("furniture-product-grid");
   grid.innerHTML = "";
-  const items = archiveData.furniture || [];
+  const allItems = archiveData.furniture || [];
+
+  const items =
+    currentHomeCategory === 'all'
+      ? allItems
+      : allItems.filter(
+          (item) =>
+            (item.category || '').toLowerCase() ===
+            currentHomeCategory.toLowerCase()
+        );
 
   if (items.length === 0) {
-    grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
+    grid.innerHTML =
+      `<p style="color: var(--text-muted); font-size: 0.9rem;">No items in this category yet.</p>`;
     return;
   }
 
@@ -417,7 +485,7 @@ function renderFurniture() {
       <div class="card-body">
         <div>
           <h4>${item.name}</h4>
-          <div class="product-meta">${item.brand} • Room: ${item.room}</div>
+          <div class="product-meta">${item.brand} • Room: ${item.room || ''}</div>
           <div class="tags-container">${tagsHtml}</div>
         </div>
         <div class="card-footer-actions">
@@ -441,6 +509,8 @@ function deleteFurnitureItem(index) {
     renderFurniture();
   }
 }
+
+/* FORM HANDLERS */
 
 function handleAddItem(event) {
   event.preventDefault();
@@ -466,12 +536,21 @@ function handleAddFurniture(event) {
   const name = document.getElementById("furnName").value;
   const brand = document.getElementById("furnMaker").value;
   const room = document.getElementById("furnRoom").value;
+  const category = document.getElementById("furnCategory").value;
   const url = document.getElementById("furnUrl").value;
   const image =
     document.getElementById("furnImg").value ||
     "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop";
 
-  const newFurn = { name, brand, room, url, image, tags: [room] };
+  const newFurn = {
+    name,
+    brand,
+    room,
+    category,
+    url,
+    image,
+    tags: [room, category],
+  };
   archiveData.furniture.push(newFurn);
   saveArchive();
   renderFurniture();
