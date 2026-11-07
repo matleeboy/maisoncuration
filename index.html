@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maison Curation — Archive</title>
+  <title>Maison Curation — Luxury Archive</title>
   <style>
     :root {
-      --bg-color: #121316;
-      --card-bg: #1a1c23;
-      --text-main: #f1f3f5;
+      --bg-color: #0c0d0f;
+      --card-bg: #14161b;
+      --card-border: #232730;
+      --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --accent: #d4af37; /* Muted luxury gold / champagne accent */
-      --accent-hover: #e5c158;
-      --border: #2d3139;
-      --tag-bg: #252830;
-      --input-bg: #15171d;
+      --accent: #c5a880; /* Refined luxury champagne gold */
+      --accent-hover: #d8bc94;
+      --input-bg: #1a1d24;
+      --radius: 8px;
     }
 
     body {
@@ -37,58 +37,65 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 2000;
       padding: 1rem;
     }
 
     .login-card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 2.5rem;
+      border: 1px solid var(--card-border);
+      padding: 3rem 2.5rem;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
       text-align: center;
       width: 100%;
-      max-width: 360px;
+      max-width: 380px;
       box-sizing: border-box;
     }
 
     .login-card h2 {
       margin-top: 0;
-      font-size: 1.5rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
     }
 
     .login-card p {
       color: var(--text-muted);
       font-size: 0.85rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.03em;
     }
 
     .login-card input {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.85rem;
       font-size: 1rem;
       text-align: center;
       background: var(--input-bg);
       color: var(--text-main);
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
       margin-bottom: 1rem;
       box-sizing: border-box;
+      letter-spacing: 0.1em;
     }
 
     .login-card button {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.85rem;
       background: var(--accent);
-      color: #121316;
+      color: #0c0d0f;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--radius);
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       transition: background 0.2s;
     }
 
@@ -99,155 +106,290 @@
     .error-msg {
       color: #f87171;
       font-size: 0.8rem;
-      margin-top: 0.75rem;
+      margin-top: 1rem;
       display: none;
     }
 
-    /* Main App Container (Hidden until login) */
+    /* Main App Container */
     #app-content {
       display: none;
     }
 
+    /* Shopify-style Header / Navigation */
     header {
       background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 2.5rem 1rem;
-      text-align: center;
+      border-bottom: 1px solid var(--card-border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    header h1 {
-      margin: 0 0 0.4rem 0;
-      font-size: 1.75rem;
+    .logo {
+      font-size: 1.25rem;
       font-weight: 500;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: none;
     }
 
-    header p {
-      margin: 0;
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
       color: var(--text-muted);
+      cursor: pointer;
       font-size: 0.9rem;
-      letter-spacing: 0.02em;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      padding: 0;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--accent);
     }
 
     .container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
     }
 
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      padding: 0.6rem 1.1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active, .tab-btn:hover {
-      background: var(--accent);
-      color: #121316;
-      border-color: var(--accent);
-    }
-
-    .section {
+    /* Views System */
+    .view {
       display: none;
     }
-
-    .section.active {
+    .view.active {
       display: block;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
+    /* Hero Banner for Home */
+    .hero-banner {
+      text-align: center;
+      padding: 4rem 1rem 5rem 1rem;
+      max-width: 700px;
+      margin: 0 auto;
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.25rem;
+    .hero-banner h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .hero-banner p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+      line-height: 1.6;
+    }
+
+    /* Shopify Collection Grid (Home Profiles) */
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .collection-card {
+      position: relative;
+      height: 420px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--card-border);
+      transition: transform 0.3s ease, border-color 0.3s ease;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      justify-content: flex-end;
+      background-size: cover;
+      background-position: center;
     }
 
-    .card h3 {
-      margin: 0 0 0.35rem 0;
-      font-size: 1.05rem;
+    .collection-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .collection-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(12,13,15,0.9) 0%, rgba(12,13,15,0.2) 60%, transparent 100%);
+    }
+
+    .collection-content {
+      position: relative;
+      z-index: 2;
+      padding: 2rem;
+      text-align: left;
+    }
+
+    .collection-content h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    .collection-content span {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
       font-weight: 500;
     }
 
-    .card .meta {
+    /* Profile View Sub-Navigation Tabs */
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .profile-title h2 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+    }
+
+    .sub-tabs {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .sub-tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .sub-tab-btn.active, .sub-tab-btn:hover {
+      background: var(--accent);
+      color: #0c0d0f;
+      border-color: var(--accent);
+    }
+
+    /* Product Grid & Cards */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+
+    .product-card:hover {
+      border-color: #3a3f4c;
+    }
+
+    .product-card h4 {
+      margin: 0 0 0.4rem 0;
+      font-size: 1.1rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+
+    .product-meta {
       font-size: 0.8rem;
       color: var(--text-muted);
       margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    .tags {
+    .tags-container {
       display: flex;
-      gap: 0.35rem;
+      gap: 0.4rem;
       flex-wrap: wrap;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
     }
 
     .tag {
-      background: var(--tag-bg);
+      background: var(--input-bg);
       font-size: 0.7rem;
-      padding: 0.2rem 0.5rem;
+      padding: 0.25rem 0.6rem;
       border-radius: 4px;
       color: var(--text-muted);
-      font-weight: 400;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
+      letter-spacing: 0.03em;
     }
 
     .product-link {
       display: inline-block;
-      margin-top: 0.5rem;
       font-size: 0.8rem;
       text-decoration: none;
       color: var(--accent);
       font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
     .product-link:hover {
       text-decoration: underline;
     }
 
-    .add-form-container {
+    /* Add Item Modal / Form Section */
+    .add-section {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 2.5rem;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 3rem;
     }
 
-    .add-form-container h3 {
+    .add-section h3 {
       margin-top: 0;
-      margin-bottom: 1rem;
       font-size: 1.1rem;
-      font-weight: 500;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
     }
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
     }
 
     .form-group {
@@ -258,161 +400,293 @@
     .form-group label {
       font-size: 0.75rem;
       font-weight: 500;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.4rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
     }
 
     .form-group input, .form-group select {
-      padding: 0.6rem;
+      padding: 0.75rem;
       background: var(--input-bg);
       color: var(--text-main);
-      border: 1px solid var(--border);
-      border-radius: 4px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
       font-size: 0.9rem;
     }
 
-    button[type="submit"] {
+    .btn-primary {
       background: var(--accent);
-      color: #121316;
+      color: #0c0d0f;
       border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 4px;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
       cursor: pointer;
       font-weight: 600;
       font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       transition: background 0.2s;
     }
 
-    button[type="submit"]:hover {
+    .btn-primary:hover {
       background: var(--accent-hover);
     }
 
-    /* Mobile Responsive Tweaks */
-    @media (max-width: 600px) {
-      header h1 { font-size: 1.4rem; }
-      .container { padding: 0 0.75rem; }
-      .login-card { padding: 1.5rem; }
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      .container { padding: 1.5rem 1rem; }
+      .hero-banner h1 { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Secure Passphrase Login Screen -->
+  <!-- Secure Login Screen -->
   <div id="login-screen">
     <div class="login-card">
       <h2>Maison Curation</h2>
-      <p>Enter family passphrase</p>
+      <p>Private Family Archive</p>
       <form onsubmit="handleLogin(event)">
-        <input type="password" id="passphraseInput" placeholder="••••••••••••" required autofocus />
+        <input type="password" id="passphraseInput" placeholder="Enter Passphrase" required autofocus />
         <button type="submit">Unlock Archive</button>
-        <div id="errorMsg" class="error-msg">Incorrect passphrase. Please try again.</div>
+        <div id="errorMsg" class="error-msg">Incorrect passphrase.</div>
       </form>
     </div>
   </div>
 
-  <!-- Main Curation App (Protected) -->
+  <!-- Main Application Content -->
   <div id="app-content">
     <header>
-      <h1>Maison Curation Archive</h1>
-      <p>Mathew & Krystin's Curated Collection</p>
+      <div class="logo" onclick="switchView('home')">Maison Curation</div>
+      <div class="nav-links">
+        <button class="nav-btn active" onclick="switchView('home')">Collections</button>
+        <button class="nav-btn" onclick="switchView('home-furniture')">Forever Home</button>
+      </div>
     </header>
 
     <div class="container">
-      <!-- Navigation Tabs -->
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('wardrobe')">Wardrobe</button>
-        <button class="tab-btn" onclick="switchTab('fragrances')">Olfactory Vault</button>
-        <button class="tab-btn" onclick="switchTab('kids')">Kids' Wardrobe</button>
-        <button class="tab-btn" onclick="switchTab('outfits')">Outfits</button>
-        <button class="tab-btn" onclick="switchTab('wishlist')">Wishlist</button>
-      </div>
 
-      <!-- Add Item Form -->
-      <div class="add-form-container">
-        <h3>Add New Item</h3>
-        <form id="addItemForm" onsubmit="handleAddItem(event)">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="itemSection">Section</label>
-              <select id="itemSection" required>
-                <option value="wardrobe">Wardrobe</option>
-                <option value="fragrances">Olfactory Vault</option>
-                <option value="kids">Kids' Wardrobe</option>
-                <option value="outfits">Outfits</option>
-                <option value="wishlist">Wishlist</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="itemName">Item Name</label>
-              <input type="text" id="itemName" placeholder="e.g., Gran Sasso Blazer" required />
-            </div>
-            <div class="form-group">
-              <label for="itemBrand">Brand</label>
-              <input type="text" id="itemBrand" placeholder="e.g., Gran Sasso" required />
-            </div>
-            <div class="form-group">
-              <label for="itemOwner">Owner</label>
-              <input type="text" id="itemOwner" placeholder="e.g., Krystin or Mathew" required />
-            </div>
-            <div class="form-group">
-              <label for="itemUrl">Product Link</label>
-              <input type="url" id="itemUrl" placeholder="https://..." />
+      <!-- HOME VIEW (Profiles & Categories) -->
+      <div id="view-home" class="view active">
+        <div class="hero-banner">
+          <h1>Curated Living</h1>
+          <p>An exclusive archive of wardrobe essentials, fine fragrances, bespoke objects, and future residential curation for Mathew, Krystin, and family.</p>
+        </div>
+
+        <div class="collection-grid">
+          <!-- Mathew Card -->
+          <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('mat')">
+            <div class="collection-content">
+              <span>Wardrobe & Vault</span>
+              <h3>Mathew</h3>
             </div>
           </div>
-          <button type="submit">Add to Archive</button>
-        </form>
+
+          <!-- Krystin Card -->
+          <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('krystin')">
+            <div class="collection-content">
+              <span>Wardrobe & Vault</span>
+              <h3>Krystin</h3>
+            </div>
+          </div>
+
+          <!-- The Kids Card -->
+          <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('kids')">
+            <div class="collection-content">
+              <span>Wardrobe & Essentials</span>
+              <h3>The Kids</h3>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Wardrobe Section -->
-      <div id="wardrobe" class="section active">
-        <h2>Wardrobe Catalog</h2>
-        <div class="grid" id="wardrobe-grid"></div>
+      <!-- PROFILE VIEW (Mat, Krystin, or Kids) -->
+      <div id="view-profile" class="view">
+        <div class="profile-header">
+          <div class="profile-title">
+            <h2 id="profile-heading">Profile Archive</h2>
+          </div>
+          <div class="sub-tabs" id="profile-sub-tabs">
+            <!-- Dynamically populated categories -->
+          </div>
+        </div>
+
+        <div class="product-grid" id="profile-product-grid">
+          <!-- Dynamically populated items -->
+        </div>
+
+        <!-- Add Item Form for Profile -->
+        <div class="add-section">
+          <h3>Add Item to <span id="form-owner-label">Profile</span></h3>
+          <form id="addItemForm" onsubmit="handleAddItem(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="itemCategory">Category</label>
+                <select id="itemCategory" required>
+                  <option value="shirts">Shirts</option>
+                  <option value="jackets">Jackets</option>
+                  <option value="pants">Pants</option>
+                  <option value="blazers">Blazers</option>
+                  <option value="shoes">Shoes</option>
+                  <option value="fragrance">Fragrance</option>
+                  <option value="sweaters">Sweaters</option>
+                  <option value="watches">Watches & Accessories</option>
+                  <option value="gifts">Gift Ideas</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="itemName">Item Name</label>
+                <input type="text" id="itemName" placeholder="e.g., Gran Sasso Blazer" required />
+              </div>
+              <div class="form-group">
+                <label for="itemBrand">Brand / Designer</label>
+                <input type="text" id="itemBrand" placeholder="e.g., Gran Sasso" required />
+              </div>
+              <div class="form-group">
+                <label for="itemUrl">Product Link URL</label>
+                <input type="url" id="itemUrl" placeholder="https://..." />
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Add to Archive</button>
+          </form>
+        </div>
       </div>
 
-      <!-- Fragrances Section -->
-      <div id="fragrances" class="section">
-        <h2>Olfactory Vault</h2>
-        <div class="grid" id="fragrances-grid"></div>
+      <!-- FOREVER HOME VIEW -->
+      <div id="view-furniture" class="view">
+        <div class="profile-header">
+          <div class="profile-title">
+            <h2>Forever Home & Furniture</h2>
+          </div>
+          <button class="sub-tab-btn active" onclick="switchView('home')">&larr; Back to Collections</button>
+        </div>
+
+        <div class="product-grid" id="furniture-product-grid">
+          <!-- Dynamically populated furniture items -->
+        </div>
+
+        <!-- Add Furniture Form -->
+        <div class="add-section">
+          <h3>Add Furniture or Decor Piece</h3>
+          <form id="addFurnitureForm" onsubmit="handleAddFurniture(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="furnName">Piece Name</label>
+                <input type="text" id="furnName" placeholder="e.g., Mid-Century Walnut Credenza" required />
+              </div>
+              <div class="form-group">
+                <label for="furnMaker">Maker / Brand</label>
+                <input type="text" id="furnMaker" placeholder="e.g., Herman Miller" required />
+              </div>
+              <div class="form-group">
+                <label for="furnRoom">Room / Placement</label>
+                <input type="text" id="furnRoom" placeholder="e.g., Living Room" required />
+              </div>
+              <div class="form-group">
+                <label for="furnUrl">Product Link URL</label>
+                <input type="url" id="furnUrl" placeholder="https://..." />
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Add to Home Curation</button>
+          </form>
+        </div>
       </div>
 
-      <!-- Kids Section -->
-      <div id="kids" class="section">
-        <h2>Kids' Wardrobe</h2>
-        <div class="grid" id="kids-grid"></div>
-      </div>
-
-      <!-- Outfits Section -->
-      <div id="outfits" class="section">
-        <h2>Outfit Curation</h2>
-        <div class="grid" id="outfits-grid"></div>
-      </div>
-
-      <!-- Wishlist Section -->
-      <div id="wishlist" class="section">
-        <h2>Wishlist & Curation Board</h2>
-        <div class="grid" id="wishlist-grid"></div>
-      </div>
     </div>
   </div>
 
   <script>
-    // Updated Passphrase
-    const FAMILY_PASSPHRASE = "Porsche"; 
+    const FAMILY_PASSPHRASE = "Porsche";
+    let currentProfile = 'mat';
+    let currentCategory = 'shirts';
+
+    // Default Master Data Archive
+    const defaultArchive = {
+      profiles: {
+        mat: {
+          name: "Mathew's Archive",
+          categories: {
+            shirts: [
+              { name: "Black Gran Sasso Polo", brand: "Gran Sasso", url: "", tags: ["100% Merino", "Neapolitan"] }
+            ],
+            jackets: [
+              { name: "Plaid Wool Jacket", brand: "Massimo Dutti", url: "", tags: ["Grey & Brown", "Wool"] }
+            ],
+            pants: [],
+            blazers: [],
+            shoes: [],
+            fragrance: [
+              { name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather", "Private Blend"] }
+            ],
+            sweaters: [
+              { name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit", "Wool"] }
+            ],
+            watches: [
+              { name: "Suede-Yoke Down Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Cashmere/Wool", "Outerwear"] }
+            ],
+            gifts: [
+              { name: "Vintage Driver Sunglasses", brand: "Persol", url: "", tags: ["Gift Idea", "Accessories"] }
+            ]
+          }
+        },
+        krystin: {
+          name: "Krystin's Archive",
+          categories: {
+            shirts: [],
+            jackets: [],
+            pants: [],
+            blazers: [
+              { name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", tags: ["Black Merino", "IT 44/46"] }
+            ],
+            shoes: [],
+            fragrance: [
+              { name: "Ojai Eau de Parfum", brand: "L'Objet", url: "https://l-objet.com", tags: ["100ml", "Mango & Saffron"] }
+            ],
+            sweaters: [],
+            watches: [],
+            gifts: [
+              { name: "Rose Noire de Parfum", brand: "L'Objet", url: "", tags: ["Gift Idea", "Fragrance"] }
+            ]
+          }
+        },
+        kids: {
+          name: "Kids' Archive",
+          categories: {
+            shirts: [],
+            jackets: [],
+            pants: [],
+            blazers: [],
+            shoes: [],
+            fragrance: [],
+            sweaters: [],
+            watches: [],
+            gifts: [
+              { name: "Custom Travel Map Placemats", brand: "Custom", url: "", tags: ["Daughters", "Travel"] }
+            ]
+          }
+        }
+      },
+      furniture: [
+        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", tags: ["Mid-Century Modern", "Wood Paneling"] }
+      ]
+    };
+
+    let archiveData = JSON.parse(localStorage.getItem('maisonArchive')) || defaultArchive;
+
+    function saveArchive() {
+      localStorage.setItem('maisonArchive', JSON.stringify(archiveData));
+    }
 
     function handleLogin(event) {
       event.preventDefault();
-      const enteredPhrase = document.getElementById('passphraseInput').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
-
-      if (enteredPhrase === FAMILY_PASSPHRASE) {
+      const val = document.getElementById('passphraseInput').value.trim();
+      if (val === FAMILY_PASSPHRASE) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         sessionStorage.setItem('isLoggedIn', 'true');
-        renderArchive();
       } else {
-        errorMsg.style.display = 'block';
+        document.getElementById('errorMsg').style.display = 'block';
         document.getElementById('passphraseInput').value = '';
       }
     }
@@ -421,94 +695,144 @@
       if (sessionStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
-        renderArchive();
-      } else {
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app-content').style.display = 'none';
       }
     };
 
-    const defaultData = {
-      wardrobe: [
-        { name: "Ribbed Knit Blazer", brand: "Gran Sasso", owner: "Krystin", tags: ["Merino Wool", "Black", "IT 44/46"], url: "" },
-        { name: "Suede-Yoke Down Puffer Vest", brand: "Brunello Cucinelli", owner: "Mathew", tags: ["Cashmere/Wool", "Tan/Brown", "Outerwear"], url: "" },
-        { name: "Quarter-Zip Fine Knit Sweater", brand: "Isaia", owner: "Mathew", tags: ["Charcoal Grey", "Fine Wool"], url: "" },
-        { name: "Plaid Wool Jacket", brand: "Massimo Dutti", owner: "Mathew", tags: ["Grey & Brown", "Plaid", "Outerwear"], url: "" }
-      ],
-      fragrances: [
-        { name: "Ojai Eau de Parfum", brand: "L'Objet", owner: "Shared", tags: ["Mango", "Saffron", "Frankincense", "Vanilla"], url: "https://l-objet.com" },
-        { name: "Tom Ford Private Blend", brand: "Tom Ford", owner: "Mathew", tags: ["Leather", "Private Blend"], url: "" }
-      ],
-      kids: [
-        { name: "Travel Map Placemats", brand: "Custom", owner: "Daughters", tags: ["Travel", "Custom"], url: "" }
-      ],
-      outfits: [
-        { name: "Urban Explorer Look", brand: "Curated Set", owner: "Mathew", tags: ["Massimo Dutti Jacket", "Gran Sasso Polo", "Denim"], url: "" }
-      ],
-      wishlist: [
-        { name: "Gran Sasso Women Merino Knit Blazer", brand: "Gran Sasso", owner: "Krystin", tags: ["Black", "Merino Extra Fine Wool"], url: "" }
-      ]
-    };
+    function switchView(viewName) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
-    let archiveData = JSON.parse(localStorage.getItem('archiveData')) || defaultData;
-
-    function saveData() {
-      localStorage.setItem('archiveData', JSON.stringify(archiveData));
-    }
-
-    function switchTab(sectionId) {
-      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(sectionId).classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    function renderArchive() {
-      for (const section in archiveData) {
-        const grid = document.getElementById(`${section}-grid`);
-        if (!grid) continue;
-        grid.innerHTML = '';
-        
-        archiveData[section].forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          
-          let tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-          let linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-          
-          card.innerHTML = `
-            <div>
-              <h3>${item.name}</h3>
-              <div class="meta">${item.brand} • Owner: ${item.owner}</div>
-              <div class="tags">${tagsHtml}</div>
-            </div>
-            ${linkHtml}
-          `;
-          grid.appendChild(card);
-        });
+      if (viewName === 'home') {
+        document.getElementById('view-home').classList.add('active');
+      } else if (viewName === 'home-furniture') {
+        document.getElementById('view-furniture').classList.add('active');
+        renderFurniture();
       }
+    }
+
+    function openProfile(profileKey) {
+      currentProfile = profileKey;
+      const profile = archiveData.profiles[profileKey];
+      document.getElementById('profile-heading').innerText = profile.name;
+      document.getElementById('form-owner-label').innerText = profile.name;
+
+      // Render Sub-Tabs
+      const categories = [
+        { key: 'shirts', label: 'Shirts' },
+        { key: 'jackets', label: 'Jackets' },
+        { key: 'pants', label: 'Pants' },
+        { key: 'blazers', label: 'Blazers' },
+        { key: 'shoes', label: 'Shoes' },
+        { key: 'fragrance', label: 'Fragrance' },
+        { key: 'sweaters', label: 'Sweaters' },
+        { key: 'watches', label: 'Watches & Acc.' },
+        { key: 'gifts', label: 'Gift Ideas' }
+      ];
+
+      const subTabsContainer = document.getElementById('profile-sub-tabs');
+      subTabsContainer.innerHTML = '';
+      categories.forEach((cat, index) => {
+        const btn = document.createElement('button');
+        btn.className = `sub-tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerText = cat.label;
+        btn.onclick = () => {
+          document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = cat.key;
+          renderProfileItems();
+        };
+        subTabsContainer.appendChild(btn);
+      });
+
+      currentCategory = categories[0].key;
+      renderProfileItems();
+
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-profile').classList.add('active');
+    }
+
+    function renderProfileItems() {
+      const grid = document.getElementById('profile-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderFurniture() {
+      const grid = document.getElementById('furniture-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.furniture || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
     }
 
     function handleAddItem(event) {
       event.preventDefault();
-      const section = document.getElementById('itemSection').value;
+      const category = document.getElementById('itemCategory').value;
       const name = document.getElementById('itemName').value;
       const brand = document.getElementById('itemBrand').value;
-      const owner = document.getElementById('itemOwner').value;
       const url = document.getElementById('itemUrl').value;
 
-      const newItem = {
-        name,
-        brand,
-        owner,
-        tags: [brand],
-        url
-      };
-
-      archiveData[section].push(newItem);
-      saveData();
-      renderArchive();
+      const newItem = { name, brand, url, tags: [brand] };
+      archiveData.profiles[currentProfile].categories[category].push(newItem);
+      saveArchive();
+      renderProfileItems();
       document.getElementById('addItemForm').reset();
+    }
+
+    function handleAddFurniture(event) {
+      event.preventDefault();
+      const name = document.getElementById('furnName').value;
+      const brand = document.getElementById('furnMaker').value;
+      const room = document.getElementById('furnRoom').value;
+      const url = document.getElementById('furnUrl').value;
+
+      const newFurn = { name, brand, room, url, tags: [room] };
+      archiveData.furniture.push(newFurn);
+      saveArchive();
+      renderFurniture();
+      document.getElementById('addFurnitureForm').reset();
     }
   </script>
 </body>
