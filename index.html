@@ -415,6 +415,12 @@
       font-size: 0.9rem;
     }
 
+    .auto-notice {
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+
     .btn-primary {
       background: var(--accent);
       color: #0c0d0f;
@@ -467,7 +473,7 @@
 
     <div class="container">
 
-      <!-- HOME VIEW (Profiles & Categories) -->
+      <!-- HOME VIEW -->
       <div id="view-home" class="view active">
         <div class="hero-banner">
           <h1>Curated Living</h1>
@@ -475,7 +481,6 @@
         </div>
 
         <div class="collection-grid">
-          <!-- Mathew Card -->
           <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('mat')">
             <div class="collection-content">
               <span>Wardrobe & Vault</span>
@@ -483,7 +488,6 @@
             </div>
           </div>
 
-          <!-- Krystin Card -->
           <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('krystin')">
             <div class="collection-content">
               <span>Wardrobe & Vault</span>
@@ -491,7 +495,6 @@
             </div>
           </div>
 
-          <!-- The Kids Card -->
           <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('kids')">
             <div class="collection-content">
               <span>Wardrobe & Essentials</span>
@@ -501,28 +504,36 @@
         </div>
       </div>
 
-      <!-- PROFILE VIEW (Mat, Krystin, or Kids) -->
+      <!-- PROFILE VIEW -->
       <div id="view-profile" class="view">
         <div class="profile-header">
           <div class="profile-title">
             <h2 id="profile-heading">Profile Archive</h2>
           </div>
-          <div class="sub-tabs" id="profile-sub-tabs">
-            <!-- Dynamically populated categories -->
-          </div>
+          <div class="sub-tabs" id="profile-sub-tabs"></div>
         </div>
 
-        <div class="product-grid" id="profile-product-grid">
-          <!-- Dynamically populated items -->
-        </div>
+        <div class="product-grid" id="profile-product-grid"></div>
 
-        <!-- Add Item Form for Profile -->
+        <!-- Add Item Form with Smart Recognition -->
         <div class="add-section">
           <h3>Add Item to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
             <div class="form-grid">
               <div class="form-group">
-                <label for="itemCategory">Category</label>
+                <label for="itemName">Item Name / Description</label>
+                <input type="text" id="itemName" placeholder="e.g., Gran Sasso Ribbed Knit Blazer" required oninput="smartAutoDetect()" />
+              </div>
+              <div class="form-group">
+                <label for="itemBrand">Brand / Designer</label>
+                <input type="text" id="itemBrand" placeholder="e.g., Gran Sasso" required />
+              </div>
+              <div class="form-group">
+                <label for="itemUrl">Product Link URL</label>
+                <input type="url" id="itemUrl" placeholder="https://..." oninput="smartAutoDetect()" />
+              </div>
+              <div class="form-group">
+                <label for="itemCategory">Category (Auto-Detected)</label>
                 <select id="itemCategory" required>
                   <option value="shirts">Shirts</option>
                   <option value="jackets">Jackets</option>
@@ -534,18 +545,7 @@
                   <option value="watches">Watches & Accessories</option>
                   <option value="gifts">Gift Ideas</option>
                 </select>
-              </div>
-              <div class="form-group">
-                <label for="itemName">Item Name</label>
-                <input type="text" id="itemName" placeholder="e.g., Gran Sasso Blazer" required />
-              </div>
-              <div class="form-group">
-                <label for="itemBrand">Brand / Designer</label>
-                <input type="text" id="itemBrand" placeholder="e.g., Gran Sasso" required />
-              </div>
-              <div class="form-group">
-                <label for="itemUrl">Product Link URL</label>
-                <input type="url" id="itemUrl" placeholder="https://..." />
+                <span class="auto-notice" id="autoNotice">✨ Smart-categorizing based on text & URL</span>
               </div>
             </div>
             <button type="submit" class="btn-primary">Add to Archive</button>
@@ -562,11 +562,8 @@
           <button class="sub-tab-btn active" onclick="switchView('home')">&larr; Back to Collections</button>
         </div>
 
-        <div class="product-grid" id="furniture-product-grid">
-          <!-- Dynamically populated furniture items -->
-        </div>
+        <div class="product-grid" id="furniture-product-grid"></div>
 
-        <!-- Add Furniture Form -->
         <div class="add-section">
           <h3>Add Furniture or Decor Piece</h3>
           <form id="addFurnitureForm" onsubmit="handleAddFurniture(event)">
@@ -601,74 +598,43 @@
     let currentProfile = 'mat';
     let currentCategory = 'shirts';
 
-    // Default Master Data Archive
     const defaultArchive = {
       profiles: {
         mat: {
           name: "Mathew's Archive",
           categories: {
-            shirts: [
-              { name: "Black Gran Sasso Polo", brand: "Gran Sasso", url: "", tags: ["100% Merino", "Neapolitan"] }
-            ],
-            jackets: [
-              { name: "Plaid Wool Jacket", brand: "Massimo Dutti", url: "", tags: ["Grey & Brown", "Wool"] }
-            ],
+            shirts: [{ name: "Black Gran Sasso Polo", brand: "Gran Sasso", url: "", tags: ["100% Merino"] }],
+            jackets: [{ name: "Plaid Wool Jacket", brand: "Massimo Dutti", url: "", tags: ["Wool"] }],
             pants: [],
             blazers: [],
             shoes: [],
-            fragrance: [
-              { name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather", "Private Blend"] }
-            ],
-            sweaters: [
-              { name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit", "Wool"] }
-            ],
-            watches: [
-              { name: "Suede-Yoke Down Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Cashmere/Wool", "Outerwear"] }
-            ],
-            gifts: [
-              { name: "Vintage Driver Sunglasses", brand: "Persol", url: "", tags: ["Gift Idea", "Accessories"] }
-            ]
+            fragrance: [{ name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather"] }],
+            sweaters: [{ name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit"] }],
+            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Outerwear"] }],
+            gifts: [{ name: "Vintage Driver Sunglasses", brand: "Persol", url: "", tags: ["Gift Idea"] }]
           }
         },
         krystin: {
           name: "Krystin's Archive",
           categories: {
-            shirts: [],
-            jackets: [],
-            pants: [],
-            blazers: [
-              { name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", tags: ["Black Merino", "IT 44/46"] }
-            ],
+            shirts: [], jackets: [], pants: [],
+            blazers: [{ name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", tags: ["Black Merino"] }],
             shoes: [],
-            fragrance: [
-              { name: "Ojai Eau de Parfum", brand: "L'Objet", url: "https://l-objet.com", tags: ["100ml", "Mango & Saffron"] }
-            ],
-            sweaters: [],
-            watches: [],
-            gifts: [
-              { name: "Rose Noire de Parfum", brand: "L'Objet", url: "", tags: ["Gift Idea", "Fragrance"] }
-            ]
+            fragrance: [{ name: "Ojai Eau de Parfum", brand: "L'Objet", url: "", tags: ["100ml"] }],
+            sweaters: [], watches: [],
+            gifts: [{ name: "Rose Noire de Parfum", brand: "L'Objet", url: "", tags: ["Gift Idea"] }]
           }
         },
         kids: {
           name: "Kids' Archive",
           categories: {
-            shirts: [],
-            jackets: [],
-            pants: [],
-            blazers: [],
-            shoes: [],
-            fragrance: [],
-            sweaters: [],
-            watches: [],
-            gifts: [
-              { name: "Custom Travel Map Placemats", brand: "Custom", url: "", tags: ["Daughters", "Travel"] }
-            ]
+            shirts: [], jackets: [], pants: [], blazers: [], shoes: [], fragrance: [], sweaters: [], watches: [],
+            gifts: [{ name: "Custom Travel Map Placemats", brand: "Custom", url: "", tags: ["Travel"] }]
           }
         }
       },
       furniture: [
-        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", tags: ["Mid-Century Modern", "Wood Paneling"] }
+        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", tags: ["Wood Paneling"] }
       ]
     };
 
@@ -716,7 +682,6 @@
       document.getElementById('profile-heading').innerText = profile.name;
       document.getElementById('form-owner-label').innerText = profile.name;
 
-      // Render Sub-Tabs
       const categories = [
         { key: 'shirts', label: 'Shirts' },
         { key: 'jackets', label: 'Jackets' },
@@ -751,89 +716,21 @@
       document.getElementById('view-profile').classList.add('active');
     }
 
-    function renderProfileItems() {
-      const grid = document.getElementById('profile-product-grid');
-      grid.innerHTML = '';
-      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
+    // Smart Auto-Categorization Engine based on text and URL keywords
+    function smartAutoDetect() {
+      const name = document.getElementById('itemName').value.toLowerCase();
+      const url = document.getElementById('itemUrl').value.toLowerCase();
+      const combined = name + " " + url;
+      const select = document.getElementById('itemCategory');
+      const notice = document.getElementById('autoNotice');
 
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
-        return;
-      }
+      let detected = null;
 
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-
-        card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand}</div>
-            <div class="tags-container">${tagsHtml}</div>
-          </div>
-          ${linkHtml}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function renderFurniture() {
-      const grid = document.getElementById('furniture-product-grid');
-      grid.innerHTML = '';
-      const items = archiveData.furniture || [];
-
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-
-        card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
-            <div class="tags-container">${tagsHtml}</div>
-          </div>
-          ${linkHtml}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function handleAddItem(event) {
-      event.preventDefault();
-      const category = document.getElementById('itemCategory').value;
-      const name = document.getElementById('itemName').value;
-      const brand = document.getElementById('itemBrand').value;
-      const url = document.getElementById('itemUrl').value;
-
-      const newItem = { name, brand, url, tags: [brand] };
-      archiveData.profiles[currentProfile].categories[category].push(newItem);
-      saveArchive();
-      renderProfileItems();
-      document.getElementById('addItemForm').reset();
-    }
-
-    function handleAddFurniture(event) {
-      event.preventDefault();
-      const name = document.getElementById('furnName').value;
-      const brand = document.getElementById('furnMaker').value;
-      const room = document.getElementById('furnRoom').value;
-      const url = document.getElementById('furnUrl').value;
-
-      const newFurn = { name, brand, room, url, tags: [room] };
-      archiveData.furniture.push(newFurn);
-      saveArchive();
-      renderFurniture();
-      document.getElementById('addFurnitureForm').reset();
-    }
-  </script>
-</body>
-</html>
+      if (/shirt|polo|tee|top|button-down|oxford/i.test(combined)) detected = 'shirts';
+      else if (/jacket|puffer|coat|outerwear|windbreaker/i.test(combined)) detected = 'jackets';
+      else if (/pant|trousers|jean|chino|denim|shorts/i.test(combined)) detected = 'pants';
+      else if (/blazer|sportcoat|suit/i.test(combined)) detected = 'blazers';
+      else if (/shoe|boot|loafer|sneaker|footwear|oxford|ghillie/i.test(combined)) detected = 'shoes';
+      else if (/fragrance|perfume|cologne|scent|eau|parfum|edp|edt/i.test(combined)) detected = 'fragrance';
+      else if (/sweater|knit|cardigan|pullover|quarter-zip|cashmere/i.test(combined)) detected = 'sweaters';
+      else if (/watch|belt|bag
