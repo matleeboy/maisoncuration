@@ -609,4 +609,262 @@
             pants: [], blazers: [], shoes: [],
             fragrance: [{ name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather"] }],
             sweaters: [{ name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit"] }],
-            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli
+            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Outerwear"] }],
+            gifts: [{ name: "Vintage Driver Sunglasses", brand: "Persol", url: "", tags: ["Gift Idea"] }]
+          }
+        },
+        krystin: {
+          name: "Krystin's Archive",
+          categories: {
+            shirts: [], jackets: [], pants: [],
+            blazers: [{ name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", tags: ["Black Merino"] }],
+            shoes: [],
+            fragrance: [{ name: "Ojai Eau de Parfum", brand: "L'Objet", url: "", tags: ["100ml"] }],
+            sweaters: [], watches: [],
+            gifts: [{ name: "Rose Noire de Parfum", brand: "L'Objet", url: "", tags: ["Gift Idea"] }]
+          }
+        },
+        kids: {
+          name: "Kids' Archive",
+          categories: {
+            shirts: [], jackets: [], pants: [], blazers: [], shoes: [], fragrance: [], sweaters: [], watches: [],
+            gifts: [{ name: "Custom Travel Map Placemats", brand: "Custom", url: "", tags: ["Travel"] }]
+          }
+        }
+      },
+      furniture: [
+        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", tags: ["Wood Paneling"] }
+      ]
+    };
+
+    let archiveData = JSON.parse(localStorage.getItem('maisonArchive')) || defaultArchive;
+
+    function saveArchive() {
+      localStorage.setItem('maisonArchive', JSON.stringify(archiveData));
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const val = document.getElementById('passphraseInput').value.trim();
+      if (val === FAMILY_PASSPHRASE) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+        sessionStorage.setItem('isLoggedIn', 'true');
+      } else {
+        document.getElementById('errorMsg').style.display = 'block';
+        document.getElementById('passphraseInput').value = '';
+      }
+    }
+
+    window.onload = function() {
+      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+      }
+    };
+
+    function switchView(viewName) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      if (viewName === 'home') {
+        document.getElementById('view-home').classList.add('active');
+      } else if (viewName === 'home-furniture') {
+        document.getElementById('view-furniture').classList.add('active');
+        renderFurniture();
+      }
+    }
+
+    function openProfile(profileKey) {
+      currentProfile = profileKey;
+      const profile = archiveData.profiles[profileKey];
+      document.getElementById('profile-heading').innerText = profile.name;
+      document.getElementById('form-owner-label').innerText = profile.name;
+
+      const categories = [
+        { key: 'shirts', label: 'Shirts' },
+        { key: 'jackets', label: 'Jackets' },
+        { key: 'pants', label: 'Pants' },
+        { key: 'blazers', label: 'Blazers' },
+        { key: 'shoes', label: 'Shoes' },
+        { key: 'fragrance', label: 'Fragrance' },
+        { key: 'sweaters', label: 'Sweaters' },
+        { key: 'watches', label: 'Watches & Acc.' },
+        { key: 'gifts', label: 'Gift Ideas' }
+      ];
+
+      const subTabsContainer = document.getElementById('profile-sub-tabs');
+      subTabsContainer.innerHTML = '';
+      categories.forEach((cat, index) => {
+        const btn = document.createElement('button');
+        btn.className = `sub-tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerText = cat.label;
+        btn.onclick = () => {
+          document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = cat.key;
+          renderProfileItems();
+        };
+        subTabsContainer.appendChild(btn);
+      });
+
+      currentCategory = categories[0].key;
+      renderProfileItems();
+
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-profile').classList.add('active');
+    }
+
+    // Smart Link Extraction & Auto-Categorization Engine
+    function smartExtractFromLink() {
+      const urlInput = document.getElementById('itemUrl').value.trim();
+      if (!urlInput) return;
+
+      try {
+        const urlObj = new URL(urlInput);
+        const hostname = urlObj.hostname.replace('www.', '');
+        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+        
+        // Extract a clean brand name from domain
+        let guessedBrand = hostname.split('.')[0];
+        guessedBrand = guessedBrand.charAt(0).toUpperCase() + guessedBrand.slice(1);
+
+        // Extract product name from URL path slugs
+        let guessedName = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Curated Item";
+        guessedName = guessedName.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '');
+        guessedName = guessedName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+        document.getElementById('itemBrand').value = guessedBrand;
+        document.getElementById('itemName').value = guessedName;
+
+        // Auto-detect category from entire URL
+        const fullUrl = urlInput.toLowerCase();
+        let detected = 'shirts';
+        if (/shirt|polo|tee|top|button/i.test(fullUrl)) detected = 'shirts';
+        else if (/jacket|puffer|coat|outerwear/i.test(fullUrl)) detected = 'jackets';
+        else if (/pant|trousers|jean|chino|denim/i.test(fullUrl)) detected = 'pants';
+        else if (/blazer|sportcoat|suit/i.test(fullUrl)) detected = 'blazers';
+        else if (/shoe|boot|loafer|sneaker|footwear|ghillie/i.test(fullUrl)) detected = 'shoes';
+        else if (/fragrance|perfume|cologne|scent|eau|parfum/i.test(fullUrl)) detected = 'fragrance';
+        else if (/sweater|knit|cardigan|pullover|quarter/i.test(fullUrl)) detected = 'sweaters';
+        else if (/watch|belt|bag|accessory|sunglasses|wallet/i.test(fullUrl)) detected = 'watches';
+        else if (/gift|present|wishlist/i.test(fullUrl)) detected = 'gifts';
+
+        document.getElementById('itemCategory').value = detected;
+        document.getElementById('autoNotice').innerText = `✨ Successfully extracted from link & categorized as ${detected.toUpperCase()}`;
+      } catch (e) {
+        // Fallback if URL is incomplete while typing
+      }
+    }
+
+    function smartExtractFurniture() {
+      const urlInput = document.getElementById('furnUrl').value.trim();
+      if (!urlInput) return;
+
+      try {
+        const urlObj = new URL(urlInput);
+        const hostname = urlObj.hostname.replace('www.', '');
+        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+        
+        let guessedMaker = hostname.split('.')[0];
+        guessedMaker = guessedMaker.charAt(0).toUpperCase() + guessedMaker.slice(1);
+
+        let guessedPiece = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Furniture Piece";
+        guessedPiece = guessedPiece.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '');
+        guessedPiece = guessedPiece.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+        document.getElementById('furnMaker').value = guessedMaker;
+        document.getElementById('furnName').value = guessedPiece;
+        document.getElementById('furnRoom').value = "Living Space";
+        document.getElementById('furnAutoNotice').innerText = `✨ Furniture details extracted successfully`;
+      } catch (e) {}
+    }
+
+    function renderProfileItems() {
+      const grid = document.getElementById('profile-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderFurniture() {
+      const grid = document.getElementById('furniture-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.furniture || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function handleAddItem(event) {
+      event.preventDefault();
+      const category = document.getElementById('itemCategory').value;
+      const name = document.getElementById('itemName').value;
+      const brand = document.getElementById('itemBrand').value;
+      const url = document.getElementById('itemUrl').value;
+
+      const newItem = { name, brand, url, tags: [brand] };
+      archiveData.profiles[currentProfile].categories[category].push(newItem);
+      saveArchive();
+      renderProfileItems();
+      document.getElementById('addItemForm').reset();
+      document.getElementById('autoNotice').innerText = `✨ Paste a link and details will be extracted automatically`;
+    }
+
+    function handleAddFurniture(event) {
+      event.preventDefault();
+      const name = document.getElementById('furnName').value;
+      const brand = document.getElementById('furnMaker').value;
+      const room = document.getElementById('furnRoom').value;
+      const url = document.getElementById('furnUrl').value;
+
+      const newFurn = { name, brand, room, url, tags: [room] };
+      archiveData.furniture.push(newFurn);
+      saveArchive();
+      renderFurniture();
+      document.getElementById('addFurnitureForm').reset();
+      document.getElementById('furnAutoNotice').innerText = `✨ Paste a link to auto-extract details`;
+    }
+  </script>
+</body>
+</html>
