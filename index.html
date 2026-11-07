@@ -64,7 +64,7 @@
                   rgba(12, 13, 15, 0.95),
                   rgba(12, 13, 15, 0.2)
                 ),
-                url('https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1000&auto=format&fit=crop');
+                url('https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1200&auto=format&fit=crop');
             "
             onclick="openProfile('mat')"
           >
@@ -84,7 +84,7 @@
                   rgba(12, 13, 15, 0.95),
                   rgba(12, 13, 15, 0.2)
                 ),
-                url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop');
+                url('https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1200&auto=format&fit=crop');
             "
             onclick="openProfile('krystin')"
           >
@@ -104,7 +104,7 @@
                   rgba(12, 13, 15, 0.95),
                   rgba(12, 13, 15, 0.2)
                 ),
-                url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop');
+                url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1200&auto=format&fit=crop');
             "
             onclick="openProfile('kids')"
           >
@@ -197,9 +197,12 @@
           <div class="profile-title">
             <h2>Forever Home &amp; Furniture</h2>
           </div>
-          <button class="sub-tab-btn active" onclick="switchView('home')">
-            &larr; Back to Collections
-          </button>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+            <div class="sub-tabs" id="home-sub-tabs"></div>
+            <button class="sub-tab-btn" onclick="switchView('home')">
+              &larr; Back to Collections
+            </button>
+          </div>
         </div>
 
         <div class="product-grid" id="furniture-product-grid"></div>
@@ -251,6 +254,22 @@
                   placeholder="e.g., Living Room"
                   required
                 />
+              </div>
+              <div class="form-group">
+                <label for="furnCategory">Category</label>
+                <select id="furnCategory" required>
+                  <option value="furniture">Furniture</option>
+                  <option value="fixtures">Fixtures</option>
+                  <option value="lights">Lights</option>
+                  <option value="tiles">Tiles</option>
+                  <option value="kitchen">Kitchen</option>
+                  <option value="living-room">Living Room</option>
+                  <option value="bathroom">Bathroom</option>
+                  <option value="bedroom">Bedroom</option>
+                  <option value="yard">Yard</option>
+                  <option value="garage">Garage</option>
+                  <option value="gym">Gym</option>
+                </select>
               </div>
             </div>
             <button type="submit" class="btn-primary">
