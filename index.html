@@ -11,7 +11,7 @@
       --card-border: #232730;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --accent: #c5a880;
+      --accent: #c5a880; /* Refined luxury champagne gold */
       --accent-hover: #d8bc94;
       --input-bg: #1a1d24;
       --radius: 8px;
@@ -26,6 +26,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Login Screen Overlay */
     #login-screen {
       position: fixed;
       top: 0;
@@ -109,10 +110,12 @@
       display: none;
     }
 
+    /* Main App Container */
     #app-content {
       display: none;
     }
 
+    /* Shopify-style Header / Navigation */
     header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--card-border);
@@ -163,6 +166,7 @@
       padding: 3rem 2rem;
     }
 
+    /* Views System */
     .view {
       display: none;
     }
@@ -170,6 +174,7 @@
       display: block;
     }
 
+    /* Hero Banner for Home */
     .hero-banner {
       text-align: center;
       padding: 4rem 1rem 5rem 1rem;
@@ -191,6 +196,7 @@
       line-height: 1.6;
     }
 
+    /* Shopify Collection Grid (Home Profiles) */
     .collection-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -247,6 +253,7 @@
       font-weight: 500;
     }
 
+    /* Profile View Sub-Navigation Tabs */
     .profile-header {
       display: flex;
       justify-content: space-between;
@@ -291,6 +298,7 @@
       border-color: var(--accent);
     }
 
+    /* Product Grid & Cards */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -301,7 +309,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 1.5rem;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -312,17 +320,33 @@
       border-color: #3a3f4c;
     }
 
+    .card-thumbnail {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: var(--input-bg);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
     .product-card h4 {
       margin: 0 0 0.4rem 0;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 400;
       letter-spacing: 0.03em;
     }
 
     .product-meta {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -331,13 +355,13 @@
       display: flex;
       gap: 0.4rem;
       flex-wrap: wrap;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
     }
 
     .tag {
       background: var(--input-bg);
-      font-size: 0.7rem;
-      padding: 0.25rem 0.6rem;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
       border-radius: 4px;
       color: var(--text-muted);
       border: 1px solid var(--card-border);
@@ -346,7 +370,7 @@
 
     .product-link {
       display: inline-block;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       text-decoration: none;
       color: var(--accent);
       font-weight: 500;
@@ -358,6 +382,7 @@
       text-decoration: underline;
     }
 
+    /* Add Item Form Section */
     .add-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -428,6 +453,12 @@
 
     .btn-primary:hover {
       background: var(--accent-hover);
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      .container { padding: 1.5rem 1rem; }
+      .hero-banner h1 { font-size: 2rem; }
     }
   </style>
 </head>
@@ -500,6 +531,7 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
+        <!-- Add Item Form -->
         <div class="add-section">
           <h3>Add Item via Link to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
@@ -583,41 +615,55 @@
     let currentProfile = 'mat';
     let currentCategory = 'shirts';
 
+    // Curated high-end aesthetic thumbnails matching category types
+    const categoryThumbnails = {
+      shirts: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=600&auto=format&fit=crop",
+      jackets: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=600&auto=format&fit=crop",
+      pants: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=600&auto=format&fit=crop",
+      blazers: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=600&auto=format&fit=crop",
+      shoes: "https://images.unsplash.com/photo-1533867617858-e7d97e0afd8b?q=80&w=600&auto=format&fit=crop",
+      fragrance: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?q=80&w=600&auto=format&fit=crop",
+      sweaters: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&auto=format&fit=crop",
+      watches: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=600&auto=format&fit=crop",
+      gifts: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=600&auto=format&fit=crop",
+      furniture: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop"
+    };
+
     const defaultArchive = {
       profiles: {
         mat: {
           name: "Mathew's Archive",
           categories: {
-            shirts: [{ name: "Black Gran Sasso Polo", brand: "Gran Sasso", url: "", tags: ["100% Merino"] }],
-            jackets: [{ name: "Plaid Wool Jacket", brand: "Massimo Dutti", url: "", tags: ["Wool"] }],
+            shirts: [{ name: "Black Gran Sasso Polo", brand: "Gran Sasso", url: "", image: categoryThumbnails.shirts, tags: ["100% Merino"] }],
+            jackets: [{ name: "Plaid Wool Jacket", brand: "Massimo Dutti", url: "", image: categoryThumbnails.jackets, tags: ["Wool"] }],
             pants: [], blazers: [], shoes: [],
-            fragrance: [{ name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather"] }],
-            sweaters: [{ name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit"] }],
-            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Outerwear"] }],
-            gifts: [{ name: "Vintage Driver Sunglasses", brand: "Persol", url: "", tags: ["Gift Idea"] }]
+            fragrance: [{ name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", image: categoryThumbnails.fragrance, tags: ["Leather"] }],
+            sweaters: [{ name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", image: categoryThumbnails.sweaters, tags: ["Fine Knit"] }],
+            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli", url: "", image: categoryThumbnails.jackets, tags: ["Outerwear"] }],
+            gifts: [{ name: "Vintage Driver Sunglasses", brand: "Persol", url: "", image: categoryThumbnails.watches, tags: ["Gift Idea"] }]
           }
         },
         krystin: {
           name: "Krystin's Archive",
           categories: {
             shirts: [], jackets: [], pants: [],
-            blazers: [{ name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", tags: ["Black Merino"] }],
+            blazers: [{ name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", image: categoryThumbnails.blazers, tags: ["Black Merino"] }],
             shoes: [],
-            fragrance: [{ name: "Ojai Eau de Parfum", brand: "L'Objet", url: "", tags: ["100ml"] }],
+            fragrance: [{ name: "Ojai Eau de Parfum", brand: "L'Objet", url: "", image: categoryThumbnails.fragrance, tags: ["100ml"] }],
             sweaters: [], watches: [],
-            gifts: [{ name: "Rose Noire de Parfum", brand: "L'Objet", url: "", tags: ["Gift Idea"] }]
+            gifts: [{ name: "Rose Noire de Parfum", brand: "L'Objet", url: "", image: categoryThumbnails.fragrance, tags: ["Gift Idea"] }]
           }
         },
         kids: {
           name: "Kids' Archive",
           categories: {
             shirts: [], jackets: [], pants: [], blazers: [], shoes: [], fragrance: [], sweaters: [], watches: [],
-            gifts: [{ name: "Custom Travel Map Placemats", brand: "Custom", url: "", tags: ["Travel"] }]
+            gifts: [{ name: "Custom Travel Map Placemats", brand: "Custom", url: "", image: categoryThumbnails.gifts, tags: ["Travel"] }]
           }
         }
       },
       furniture: [
-        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", tags: ["Wood Paneling"] }
+        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", image: categoryThumbnails.furniture, tags: ["Wood Paneling"] }
       ]
     };
 
@@ -642,9 +688,7 @@
       }
     }
 
-    // Bulletproof Load Logic: Checks state immediately without blocking
     window.addEventListener('DOMContentLoaded', () => {
-      // Emergency reset check: if URL has ?reset=true, clears auth loop instantly
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('reset') === 'true') {
         localStorage.removeItem('maisonAuth');
@@ -711,7 +755,6 @@
       document.getElementById('view-profile').classList.add('active');
     }
 
-    // Smart Extraction Engine
     function smartExtractFromLink() {
       const urlInput = document.getElementById('itemUrl').value.trim();
       if (!urlInput) return;
@@ -820,14 +863,18 @@
         card.className = 'product-card';
         const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
         const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+        const imgSrc = item.image || categoryThumbnails[currentCategory] || categoryThumbnails.shirts;
 
         card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand}</div>
-            <div class="tags-container">${tagsHtml}</div>
+          <img src="${imgSrc}" alt="${item.name}" class="card-thumbnail" />
+          <div class="card-body">
+            <div>
+              <h4>${item.name}</h4>
+              <div class="product-meta">${item.brand}</div>
+              <div class="tags-container">${tagsHtml}</div>
+            </div>
+            ${linkHtml}
           </div>
-          ${linkHtml}
         `;
         grid.appendChild(card);
       });
@@ -848,14 +895,18 @@
         card.className = 'product-card';
         const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
         const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+        const imgSrc = item.image || categoryThumbnails.furniture;
 
         card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
-            <div class="tags-container">${tagsHtml}</div>
+          <img src="${imgSrc}" alt="${item.name}" class="card-thumbnail" />
+          <div class="card-body">
+            <div>
+              <h4>${item.name}</h4>
+              <div class="product-meta">${item.brand} • Room: ${item.room}</div>
+              <div class="tags-container">${tagsHtml}</div>
+            </div>
+            ${linkHtml}
           </div>
-          ${linkHtml}
         `;
         grid.appendChild(card);
       });
@@ -867,8 +918,9 @@
       const name = document.getElementById('itemName').value;
       const brand = document.getElementById('itemBrand').value;
       const url = document.getElementById('itemUrl').value;
+      const image = categoryThumbnails[category] || categoryThumbnails.shirts;
 
-      const newItem = { name, brand, url, tags: [brand] };
+      const newItem = { name, brand, url, image, tags: [brand] };
       archiveData.profiles[currentProfile].categories[category].push(newItem);
       saveArchive();
       renderProfileItems();
@@ -882,8 +934,9 @@
       const brand = document.getElementById('furnMaker').value;
       const room = document.getElementById('furnRoom').value;
       const url = document.getElementById('furnUrl').value;
+      const image = categoryThumbnails.furniture;
 
-      const newFurn = { name, brand, room, url, tags: [room] };
+      const newFurn = { name, brand, room, url, image, tags: [room] };
       archiveData.furniture.push(newFurn);
       saveArchive();
       renderFurniture();
