@@ -515,7 +515,7 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
-        <!-- Add Item Form (Smart Brand Extraction) -->
+        <!-- Add Item Form (Optimized Smart Extraction) -->
         <div class="add-section">
           <h3>Add Item via Link to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
@@ -523,14 +523,14 @@
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label for="itemUrl">Product Link URL (Paste here first)</label>
                 <input type="url" id="itemUrl" placeholder="https://poshmark.com/listing/..." required oninput="smartExtractFromLink()" />
-                <span class="auto-notice" id="autoNotice">✨ Paste a link and brand/item will be extracted automatically</span>
+                <span class="auto-notice" id="autoNotice">✨ Paste any Poshmark, eBay, or brand link for instant extraction</span>
               </div>
               <div class="form-group">
-                <label for="itemBrand">Brand / Designer (Smart-Detected)</label>
+                <label for="itemBrand">Brand / Designer</label>
                 <input type="text" id="itemBrand" placeholder="Extracted brand..." required />
               </div>
               <div class="form-group">
-                <label for="itemName">Item Name / Description (Smart-Detected)</label>
+                <label for="itemName">Item Name / Description</label>
                 <input type="text" id="itemName" placeholder="Extracted item title..." required />
               </div>
               <div class="form-group">
@@ -720,176 +720,15 @@
       document.getElementById('view-profile').classList.add('active');
     }
 
-    // Smart Brand & Item Extraction Engine (Scans Resale / URL Slugs for Designer Names)
+    // Highly Optimized Smart Extraction Engine
     function smartExtractFromLink() {
       const urlInput = document.getElementById('itemUrl').value.trim();
       if (!urlInput) return;
 
       try {
-        const urlObj = new URL(urlInput);
         const fullUrl = urlInput.toLowerCase();
-        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-
-        // Dictionary of luxury brands to look for inside resale URLs
+        
+        // Comprehensive Luxury & Tailoring Brand Dictionary
         const luxuryBrands = [
           "brunello cucinelli", "gran sasso", "isaia", "tom ford", "massimo dutti", 
           "l'objet", "fedeli", "eleventy", "boggi", "distretto 12", "massimo alba",
-          "herman miller", "persol", "ralph lauren", "burberry", "zegna", "loro piana",
-          "canali", "brioni", "kiton", "barbour", "bottega veneta", "gucci", "prada"
-        ];
-
-        let foundBrand = "";
-        for (let brand of luxuryBrands) {
-          if (fullUrl.includes(brand)) {
-            // Capitalize nicely
-            foundBrand = brand.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-            break;
-          }
-        }
-
-        // Fallback to first meaningful slug if brand isn't in our dictionary
-        if (!foundBrand) {
-          let candidate = pathSegments.find(seg => !['listing', 'p', 'product', 'item', 'buy', 'shop'].includes(seg));
-          foundBrand = candidate ? candidate.replace(/[-_]+/g, ' ').split(' ')[0] : "Curated Brand";
-          foundBrand = foundBrand.charAt(0).toUpperCase() + foundBrand.slice(1);
-        }
-
-        // Extract item name from slug
-        let guessedName = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Curated Item";
-        guessedName = guessedName.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '');
-        // Clean up common URL noise words
-        guessedName = guessedName.replace(/men|women|size|l|m|s|xl|listing/gi, '');
-        guessedName = guessedName.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        if (!guessedName) guessedName = "Luxury Apparel Piece";
-
-        document.getElementById('itemBrand').value = foundBrand;
-        document.getElementById('itemName').value = guessedName;
-
-        // Auto-detect category
-        let detected = 'shirts';
-        if (/shirt|polo|tee|top|button/i.test(fullUrl)) detected = 'shirts';
-        else if (/jacket|puffer|coat|outerwear|vest/i.test(fullUrl)) detected = 'jackets';
-        else if (/pant|trousers|jean|chino|denim/i.test(fullUrl)) detected = 'pants';
-        else if (/blazer|sportcoat|suit/i.test(fullUrl)) detected = 'blazers';
-        else if (/shoe|boot|loafer|sneaker|footwear|ghillie/i.test(fullUrl)) detected = 'shoes';
-        else if (/fragrance|perfume|cologne|scent|eau|parfum/i.test(fullUrl)) detected = 'fragrance';
-        else if (/sweater|knit|cardigan|pullover|quarter/i.test(fullUrl)) detected = 'sweaters';
-        else if (/watch|belt|bag|accessory|sunglasses|wallet|vest/i.test(fullUrl)) detected = 'watches';
-        else if (/gift|present|wishlist/i.test(fullUrl)) detected = 'gifts';
-
-        document.getElementById('itemCategory').value = detected;
-        document.getElementById('autoNotice').innerText = `✨ Detected Brand: ${foundBrand} | Category: ${detected.toUpperCase()}`;
-      } catch (e) {}
-    }
-
-    function smartExtractFurniture() {
-      const urlInput = document.getElementById('furnUrl').value.trim();
-      if (!urlInput) return;
-
-      try {
-        const urlObj = new URL(urlInput);
-        const hostname = urlObj.hostname.replace('www.', '');
-        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-        
-        let guessedMaker = hostname.split('.')[0];
-        guessedMaker = guessedMaker.charAt(0).toUpperCase() + guessedMaker.slice(1);
-
-        let guessedPiece = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Furniture Piece";
-        guessedPiece = guessedPiece.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '');
-        guessedPiece = guessedPiece.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-        document.getElementById('furnMaker').value = guessedMaker;
-        document.getElementById('furnName').value = guessedPiece;
-        document.getElementById('furnRoom').value = "Living Space";
-        document.getElementById('furnAutoNotice').innerText = `✨ Furniture details extracted successfully`;
-      } catch (e) {}
-    }
-
-    function renderProfileItems() {
-      const grid = document.getElementById('profile-product-grid');
-      grid.innerHTML = '';
-      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
-
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-
-        card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand}</div>
-            <div class="tags-container">${tagsHtml}</div>
-          </div>
-          ${linkHtml}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function renderFurniture() {
-      const grid = document.getElementById('furniture-product-grid');
-      grid.innerHTML = '';
-      const items = archiveData.furniture || [];
-
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-
-        card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
-            <div class="tags-container">${tagsHtml}</div>
-          </div>
-          ${linkHtml}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function handleAddItem(event) {
-      event.preventDefault();
-      const category = document.getElementById('itemCategory').value;
-      const name = document.getElementById('itemName').value;
-      const brand = document.getElementById('itemBrand').value;
-      const url = document.getElementById('itemUrl').value;
-
-      const newItem = { name, brand, url, tags: [brand] };
-      archiveData.profiles[currentProfile].categories[category].push(newItem);
-      saveArchive();
-      renderProfileItems();
-      document.getElementById('addItemForm').reset();
-      document.getElementById('autoNotice').innerText = `✨ Paste a link and brand/item will be extracted automatically`;
-    }
-
-    function handleAddFurniture(event) {
-      event.preventDefault();
-      const name = document.getElementById('furnName').value;
-      const brand = document.getElementById('furnMaker').value;
-      const room = document.getElementById('furnRoom').value;
-      const url = document.getElementById('furnUrl').value;
-
-      const newFurn = { name, brand, room, url, tags: [room] };
-      archiveData.furniture.push(newFurn);
-      saveArchive();
-      renderFurniture();
-      document.getElementById('addFurnitureForm').reset();
-      document.getElementById('furnAutoNotice').innerText = `✨ Paste a link to auto-extract details`;
-    }
-  </script>
-</body>
-</html>
