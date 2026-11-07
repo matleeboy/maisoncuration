@@ -108,7 +108,7 @@ body {
   display: none;
 }
 
-/* Shopify-style Header / Navigation */
+/* Header / Navigation */
 header {
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--card-border);
@@ -189,7 +189,7 @@ header {
   line-height: 1.6;
 }
 
-/* Shopify Collection Grid (Home Profiles) */
+/* Collection Grid (Home Profiles) */
 .collection-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
