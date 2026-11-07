@@ -1,20 +1,28 @@
 // api/get-product-meta.js
-// For Vercel: available at /api/get-product-meta?url=...
+// Vercel serverless function: /api/get-product-meta?url=...
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  const url = req.query.url;
-  if (!url) {
-    res.status(400).json({ error: 'Missing url parameter' });
-    return;
-  }
-
   try {
-    const targetUrl = decodeURIComponent(url);
+    if (req.method !== 'GET') {
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
+    const url = req.query.url;
+    if (!url) {
+      res.status(400).json({ error: 'Missing url parameter' });
+      return;
+    }
+
+    let targetUrl;
+    try {
+      targetUrl = decodeURIComponent(url);
+      // Validate URL
+      new URL(targetUrl);
+    } catch {
+      res.status(400).json({ error: 'Invalid url parameter' });
+      return;
+    }
 
     const response = await fetch(targetUrl, {
       headers: {
@@ -36,19 +44,31 @@ export default async function handler(req, res) {
 
     const html = await response.text();
 
+    // If the content is not HTML, bail early
+    if (!html || !html.includes('<html')) {
+      res.status(500).json({ error: 'Fetched content is not HTML' });
+      return;
+    }
+
+    const safeMatch = (regex) => {
+      try {
+        const match = html.match(regex);
+        return match ? match[1].trim() : '';
+      } catch {
+        return '';
+      }
+    };
+
     const getMetaContent = (propertyName) => {
       const regex = new RegExp(
         `<meta[^>]+(?:property|name)=["']${propertyName}["'][^>]*content=["']([^"']+)["'][^>]*>`,
         'i'
       );
-      const match = html.match(regex);
-      return match ? match[1].trim() : '';
+      return safeMatch(regex);
     };
 
-    const getTitleTag = () => {
-      const match = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-      return match ? match[1].trim() : '';
-    };
+    const getTitleTag = () =>
+      safeMatch(/<title[^>]*>([^<]+)<\/title>/i);
 
     const ogTitle = getMetaContent('og:title');
     const twitterTitle = getMetaContent('twitter:title');
@@ -64,16 +84,23 @@ export default async function handler(req, res) {
     const separators = [' - ', ' | ', ' — ', ' – '];
     for (const sep of separators) {
       if (rawTitle.includes(sep)) {
-        const [left, right] = rawTitle.split(sep);
-        brand = left.trim();
-        name = right.trim();
+        const parts = rawTitle.split(sep);
+        if (parts.length >= 2) {
+          const left = parts[0];
+          const right = parts.slice(1).join(sep);
+          if (left && right) {
+            brand = left.trim();
+            name = right.trim();
+          }
+        }
         break;
       }
     }
 
+    // Derive brand from hostname if we didn't find one
     if (!brand) {
       const hostname = new URL(targetUrl).hostname.replace(/^www\./, '');
-      brand = hostname.split('.')[0];
+      brand = hostname.split('.')[0] || 'Brand';
       brand = brand.charAt(0).toUpperCase() + brand.slice(1);
     }
 
@@ -104,6 +131,8 @@ export default async function handler(req, res) {
     res.status(200).json(result);
   } catch (err) {
     console.error('Error in get-product-meta:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res
+      .status(500)
+      .json({ error: 'Internal server error', detail: String(err) });
   }
 }
