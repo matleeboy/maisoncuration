@@ -291,7 +291,7 @@
   <div id="app-content">
     <header>
       <h1>Wardrobe & Fragrance Curation Archive</h1>
-      <p>Matthew & Krystin's Curated Collection</p>
+      <p>Mathew & Krystin's Curated Collection</p>
     </header>
 
     <div class="container">
@@ -299,6 +299,7 @@
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('wardrobe')">Wardrobe Catalog</button>
         <button class="tab-btn" onclick="switchTab('fragrances')">Olfactory Vault</button>
+        <button class="tab-btn" onclick="switchTab('kids')">Kids' Wardrobe</button>
         <button class="tab-btn" onclick="switchTab('outfits')">Outfit Curation</button>
         <button class="tab-btn" onclick="switchTab('wishlist')">Wishlist & Curation Board</button>
       </div>
@@ -313,6 +314,7 @@
               <select id="itemSection" required>
                 <option value="wardrobe">Wardrobe Catalog</option>
                 <option value="fragrances">Olfactory Vault</option>
+                <option value="kids">Kids' Wardrobe</option>
                 <option value="outfits">Outfit Curation</option>
                 <option value="wishlist">Wishlist & Curation Board</option>
               </select>
@@ -327,7 +329,7 @@
             </div>
             <div class="form-group">
               <label for="itemOwner">Owner / Recipient</label>
-              <input type="text" id="itemOwner" placeholder="e.g., Krystin or Matthew" required />
+              <input type="text" id="itemOwner" placeholder="e.g., Krystin, Mathew, or Kids" required />
             </div>
             <div class="form-group">
               <label for="itemUrl">Product Link (URL)</label>
@@ -348,6 +350,12 @@
       <div id="fragrances" class="section">
         <h2>Olfactory Vault</h2>
         <div class="grid" id="fragrances-grid"></div>
+      </div>
+
+      <!-- Kids Section -->
+      <div id="kids" class="section">
+        <h2>Kids' Wardrobe</h2>
+        <div class="grid" id="kids-grid"></div>
       </div>
 
       <!-- Outfits Section -->
@@ -386,28 +394,34 @@
       }
     }
 
-    // Check if already logged in during this browser session
+    // Check login status on load
     window.onload = function() {
       if (sessionStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
         renderArchive();
+      } else {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-content').style.display = 'none';
       }
     };
 
     const defaultData = {
       wardrobe: [
         { name: "Ribbed Knit Blazer", brand: "Gran Sasso", owner: "Krystin", tags: ["Merino Wool", "Black", "IT 44/46"], url: "" },
-        { name: "Suede-Yoke Down Puffer Vest", brand: "Brunello Cucinelli", owner: "Matthew", tags: ["Cashmere/Wool", "Tan/Brown", "Outerwear"], url: "" },
-        { name: "Quarter-Zip Fine Knit Sweater", brand: "Isaia", owner: "Matthew", tags: ["Charcoal Grey", "Fine Wool"], url: "" },
-        { name: "Plaid Wool Jacket", brand: "Massimo Dutti", owner: "Matthew", tags: ["Grey & Brown", "Plaid", "Outerwear"], url: "" }
+        { name: "Suede-Yoke Down Puffer Vest", brand: "Brunello Cucinelli", owner: "Mathew", tags: ["Cashmere/Wool", "Tan/Brown", "Outerwear"], url: "" },
+        { name: "Quarter-Zip Fine Knit Sweater", brand: "Isaia", owner: "Mathew", tags: ["Charcoal Grey", "Fine Wool"], url: "" },
+        { name: "Plaid Wool Jacket", brand: "Massimo Dutti", owner: "Mathew", tags: ["Grey & Brown", "Plaid", "Outerwear"], url: "" }
       ],
       fragrances: [
         { name: "Ojai Eau de Parfum", brand: "L'Objet", owner: "Shared", tags: ["Mango", "Saffron", "Frankincense", "Vanilla"], url: "https://l-objet.com" },
-        { name: "Tom Ford Private Blend", brand: "Tom Ford", owner: "Matthew", tags: ["Leather", "Private Blend"], url: "" }
+        { name: "Tom Ford Private Blend", brand: "Tom Ford", owner: "Mathew", tags: ["Leather", "Private Blend"], url: "" }
+      ],
+      kids: [
+        { name: "Travel Map Placemats", brand: "Custom", owner: "Daughters", tags: ["Travel", "Custom"], url: "" }
       ],
       outfits: [
-        { name: "Urban Explorer Look", brand: "Curated Set", owner: "Matthew", tags: ["Massimo Dutti Jacket", "Gran Sasso Polo", "Denim"], url: "" }
+        { name: "Urban Explorer Look", brand: "Curated Set", owner: "Mathew", tags: ["Massimo Dutti Jacket", "Gran Sasso Polo", "Denim"], url: "" }
       ],
       wishlist: [
         { name: "Gran Sasso Women Merino Knit Blazer", brand: "Gran Sasso", owner: "Krystin", tags: ["Black", "Merino Extra Fine Wool"], url: "" }
@@ -452,6 +466,8 @@
         });
       }
     }
+
+    function handleaddItem(event) {} // placeholder safety
 
     function handleAddItem(event) {
       event.preventDefault();
