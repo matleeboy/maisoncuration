@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maison Curation — Luxury Archive</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -14,7 +14,13 @@
       <h2>Maison Curation</h2>
       <p>Private Family Archive</p>
       <form onsubmit="handleLogin(event)">
-        <input type="password" id="passphraseInput" placeholder="Enter Passphrase" required autofocus />
+        <input
+          type="password"
+          id="passphraseInput"
+          placeholder="Enter Passphrase"
+          required
+          autofocus
+        />
         <button type="submit">Unlock Archive</button>
         <div id="errorMsg" class="error-msg">Incorrect passphrase.</div>
       </form>
@@ -26,38 +32,84 @@
     <header>
       <div class="logo" onclick="switchView('home')">Maison Curation</div>
       <div class="nav-links">
-        <button class="nav-btn active" onclick="switchView('home')">Collections</button>
-        <button class="nav-btn" onclick="switchView('home-furniture')">Forever Home</button>
+        <button class="nav-btn active" onclick="switchView('home')">
+          Collections
+        </button>
+        <button class="nav-btn" onclick="switchView('home-furniture')">
+          Forever Home
+        </button>
       </div>
     </header>
 
     <div class="container">
-
       <!-- HOME VIEW -->
       <div id="view-home" class="view active">
         <div class="hero-banner">
           <h1>Curated Living</h1>
-          <p>An exclusive archive of wardrobe essentials, fine fragrances, bespoke objects, and future residential curation for Mathew, Krystin, and family.</p>
+          <p>
+            An exclusive archive of wardrobe essentials, fine fragrances,
+            bespoke objects, and future residential curation for Mathew,
+            Krystin, and family.
+          </p>
         </div>
 
         <div class="collection-grid">
-          <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('mat')">
+          <!-- Mathew -->
+          <div
+            class="collection-card"
+            style="
+              background-image:
+                linear-gradient(
+                  to top,
+                  rgba(12, 13, 15, 0.95),
+                  rgba(12, 13, 15, 0.2)
+                ),
+                url('https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1000&auto=format&fit=crop');
+            "
+            onclick="openProfile('mat')"
+          >
             <div class="collection-content">
-              <span>Wardrobe & Vault</span>
+              <span>Wardrobe &amp; Vault</span>
               <h3>Mathew</h3>
             </div>
           </div>
 
-          <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('krystin')">
+          <!-- Krystin -->
+          <div
+            class="collection-card"
+            style="
+              background-image:
+                linear-gradient(
+                  to top,
+                  rgba(12, 13, 15, 0.95),
+                  rgba(12, 13, 15, 0.2)
+                ),
+                url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop');
+            "
+            onclick="openProfile('krystin')"
+          >
             <div class="collection-content">
-              <span>Wardrobe & Vault</span>
+              <span>Wardrobe &amp; Vault</span>
               <h3>Krystin</h3>
             </div>
           </div>
 
-          <div class="collection-card" style="background-image: linear-gradient(to top, rgba(12,13,15,0.95), rgba(12,13,15,0.2)), url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop');" onclick="openProfile('kids')">
+          <!-- Kids -->
+          <div
+            class="collection-card"
+            style="
+              background-image:
+                linear-gradient(
+                  to top,
+                  rgba(12, 13, 15, 0.95),
+                  rgba(12, 13, 15, 0.2)
+                ),
+                url('https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=1000&auto=format&fit=crop');
+            "
+            onclick="openProfile('kids')"
+          >
             <div class="collection-content">
-              <span>Wardrobe & Essentials</span>
+              <span>Wardrobe &amp; Essentials</span>
               <h3>The Kids</h3>
             </div>
           </div>
@@ -75,24 +127,49 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
-        <!-- Link-to-card Form -->
+        <!-- Add Item via Link -->
         <div class="add-section">
-          <h3>Add Item via Link to <span id="form-owner-label">Profile</span></h3>
+          <h3>
+            Add Item via Link to
+            <span id="form-owner-label">Profile</span>
+          </h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
             <div class="form-grid">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label for="itemUrl">Product Link URL (Just paste here!)</label>
-                <input type="url" id="itemUrl" placeholder="https://poshmark.com/listing/..." required oninput="smartExtractFromLink()" />
-                <span class="auto-notice" id="autoNotice">✨ Automatically extracts details and generates page screenshot</span>
+                <input
+                  type="url"
+                  id="itemUrl"
+                  placeholder="https://poshmark.com/listing/..."
+                  required
+                  oninput="smartExtractFromLink()"
+                />
+                <span class="auto-notice" id="autoNotice">
+                  ✨ Automatically extracts details and generates page
+                  screenshot
+                </span>
               </div>
+
+              <!-- Hidden auto-generated image URL -->
               <input type="hidden" id="itemImg" />
+
               <div class="form-group">
                 <label for="itemBrand">Brand / Designer</label>
-                <input type="text" id="itemBrand" placeholder="Extracted brand..." required />
+                <input
+                  type="text"
+                  id="itemBrand"
+                  placeholder="Extracted brand..."
+                  required
+                />
               </div>
               <div class="form-group">
                 <label for="itemName">Item Name / Description</label>
-                <input type="text" id="itemName" placeholder="Extracted item title..." required />
+                <input
+                  type="text"
+                  id="itemName"
+                  placeholder="Extracted item title..."
+                  required
+                />
               </div>
               <div class="form-group">
                 <label for="itemCategory">Category</label>
@@ -104,7 +181,7 @@
                   <option value="shoes">Shoes</option>
                   <option value="fragrance">Fragrance</option>
                   <option value="sweaters">Sweaters</option>
-                  <option value="watches">Watches & Accessories</option>
+                  <option value="watches">Watches &amp; Accessories</option>
                   <option value="gifts">Gift Ideas</option>
                 </select>
               </div>
@@ -118,9 +195,11 @@
       <div id="view-furniture" class="view">
         <div class="profile-header">
           <div class="profile-title">
-            <h2>Forever Home & Furniture</h2>
+            <h2>Forever Home &amp; Furniture</h2>
           </div>
-          <button class="sub-tab-btn active" onclick="switchView('home')">&larr; Back to Collections</button>
+          <button class="sub-tab-btn active" onclick="switchView('home')">
+            &larr; Back to Collections
+          </button>
         </div>
 
         <div class="product-grid" id="furniture-product-grid"></div>
@@ -131,31 +210,59 @@
             <div class="form-grid">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label for="furnUrl">Product Link URL</label>
-                <input type="url" id="furnUrl" placeholder="https://..." required oninput="smartExtractFurniture()" />
-                <span class="auto-notice" id="furnAutoNotice">✨ Automatically extracts details and screenshot</span>
+                <input
+                  type="url"
+                  id="furnUrl"
+                  placeholder="https://..."
+                  required
+                  oninput="smartExtractFurniture()"
+                />
+                <span class="auto-notice" id="furnAutoNotice">
+                  ✨ Automatically extracts details and screenshot
+                </span>
               </div>
+
+              <!-- Hidden auto-generated image URL -->
               <input type="hidden" id="furnImg" />
+
               <div class="form-group">
                 <label for="furnMaker">Maker / Brand</label>
-                <input type="text" id="furnMaker" placeholder="Maker..." required />
+                <input
+                  type="text"
+                  id="furnMaker"
+                  placeholder="Maker..."
+                  required
+                />
               </div>
               <div class="form-group">
                 <label for="furnName">Piece Name</label>
-                <input type="text" id="furnName" placeholder="Piece name..." required />
+                <input
+                  type="text"
+                  id="furnName"
+                  placeholder="Piece name..."
+                  required
+                />
               </div>
               <div class="form-group">
                 <label for="furnRoom">Room / Placement</label>
-                <input type="text" id="furnRoom" placeholder="e.g., Living Room" required />
+                <input
+                  type="text"
+                  id="furnRoom"
+                  placeholder="e.g., Living Room"
+                  required
+                />
               </div>
             </div>
-            <button type="submit" class="btn-primary">Add to Home Curation</button>
+            <button type="submit" class="btn-primary">
+              Add to Home Curation
+            </button>
           </form>
         </div>
       </div>
-
     </div>
   </div>
 
+  <!-- Main script -->
   <script src="script.js"></script>
 </body>
 </html>
