@@ -11,7 +11,7 @@
       --card-border: #232730;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --accent: #c5a880;
+      --accent: #c5a880; /* Refined luxury champagne gold */
       --accent-hover: #d8bc94;
       --input-bg: #1a1d24;
       --radius: 8px;
@@ -26,6 +26,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Login Screen Overlay */
     #login-screen {
       position: fixed;
       top: 0;
@@ -95,6 +96,7 @@
       cursor: pointer;
       letter-spacing: 0.05em;
       text-transform: uppercase;
+      transition: background 0.2s;
     }
 
     .login-card button:hover {
@@ -108,10 +110,12 @@
       display: none;
     }
 
+    /* Main App Container */
     #app-content {
       display: none;
     }
 
+    /* Shopify-style Header / Navigation */
     header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--card-border);
@@ -131,6 +135,7 @@
       text-transform: uppercase;
       color: var(--accent);
       cursor: pointer;
+      text-decoration: none;
     }
 
     .nav-links {
@@ -161,6 +166,7 @@
       padding: 3rem 2rem;
     }
 
+    /* Views System */
     .view {
       display: none;
     }
@@ -168,6 +174,7 @@
       display: block;
     }
 
+    /* Hero Banner for Home */
     .hero-banner {
       text-align: center;
       padding: 4rem 1rem 5rem 1rem;
@@ -189,6 +196,7 @@
       line-height: 1.6;
     }
 
+    /* Shopify Collection Grid (Home Profiles) */
     .collection-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -245,6 +253,7 @@
       font-weight: 500;
     }
 
+    /* Profile View Sub-Navigation Tabs */
     .profile-header {
       display: flex;
       justify-content: space-between;
@@ -289,6 +298,7 @@
       border-color: var(--accent);
     }
 
+    /* Product Grid & Cards */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -303,6 +313,11 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+
+    .product-card:hover {
+      border-color: #3a3f4c;
     }
 
     .product-card h4 {
@@ -334,6 +349,7 @@
       border-radius: 4px;
       color: var(--text-muted);
       border: 1px solid var(--card-border);
+      letter-spacing: 0.03em;
     }
 
     .product-link {
@@ -350,6 +366,7 @@
       text-decoration: underline;
     }
 
+    /* Add Item Form Section */
     .add-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -370,7 +387,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.25rem;
       margin-bottom: 1.25rem;
     }
@@ -401,7 +418,7 @@
     .auto-notice {
       font-size: 0.75rem;
       color: var(--accent);
-      margin-top: 0.25rem;
+      margin-top: 0.3rem;
     }
 
     .btn-primary {
@@ -415,10 +432,17 @@
       font-size: 0.85rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      transition: background 0.2s;
     }
 
     .btn-primary:hover {
       background: var(--accent-hover);
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      .container { padding: 1.5rem 1rem; }
+      .hero-banner h1 { font-size: 2rem; }
     }
   </style>
 </head>
@@ -491,21 +515,23 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
+        <!-- Add Item Form (Link-First Auto Extraction) -->
         <div class="add-section">
-          <h3>Add Item to <span id="form-owner-label">Profile</span></h3>
+          <h3>Add Item via Link to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
             <div class="form-grid">
-              <div class="form-group">
-                <label for="itemName">Item Name / Description</label>
-                <input type="text" id="itemName" placeholder="e.g., Gran Sasso Ribbed Knit Blazer" required oninput="smartAutoDetect()" />
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="itemUrl">Product Link URL (Paste here first)</label>
+                <input type="url" id="itemUrl" placeholder="https://www.brand.com/product-page" required oninput="smartExtractFromLink()" />
+                <span class="auto-notice" id="autoNotice">✨ Paste a link and details will be extracted automatically</span>
               </div>
               <div class="form-group">
-                <label for="itemBrand">Brand / Designer</label>
-                <input type="text" id="itemBrand" placeholder="e.g., Gran Sasso" required />
+                <label for="itemBrand">Brand / Designer (Auto-Filled)</label>
+                <input type="text" id="itemBrand" placeholder="Extracted brand..." required />
               </div>
               <div class="form-group">
-                <label for="itemUrl">Product Link URL</label>
-                <input type="url" id="itemUrl" placeholder="https://..." oninput="smartAutoDetect()" />
+                <label for="itemName">Item Name / Description (Auto-Filled)</label>
+                <input type="text" id="itemName" placeholder="Extracted item title..." required />
               </div>
               <div class="form-group">
                 <label for="itemCategory">Category (Auto-Detected)</label>
@@ -520,7 +546,6 @@
                   <option value="watches">Watches & Accessories</option>
                   <option value="gifts">Gift Ideas</option>
                 </select>
-                <span class="auto-notice" id="autoNotice">✨ Smart-categorizing based on text & URL</span>
               </div>
             </div>
             <button type="submit" class="btn-primary">Add to Archive</button>
@@ -540,24 +565,25 @@
         <div class="product-grid" id="furniture-product-grid"></div>
 
         <div class="add-section">
-          <h3>Add Furniture or Decor Piece</h3>
+          <h3>Add Furniture via Link</h3>
           <form id="addFurnitureForm" onsubmit="handleAddFurniture(event)">
             <div class="form-grid">
-              <div class="form-group">
-                <label for="furnName">Piece Name</label>
-                <input type="text" id="furnName" placeholder="e.g., Mid-Century Walnut Credenza" required />
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="furnUrl">Product Link URL</label>
+                <input type="url" id="furnUrl" placeholder="https://..." required oninput="smartExtractFurniture()" />
+                <span class="auto-notice" id="furnAutoNotice">✨ Paste a link to auto-extract details</span>
               </div>
               <div class="form-group">
                 <label for="furnMaker">Maker / Brand</label>
-                <input type="text" id="furnMaker" placeholder="e.g., Herman Miller" required />
+                <input type="text" id="furnMaker" placeholder="Maker..." required />
+              </div>
+              <div class="form-group">
+                <label for="furnName">Piece Name</label>
+                <input type="text" id="furnName" placeholder="Piece name..." required />
               </div>
               <div class="form-group">
                 <label for="furnRoom">Room / Placement</label>
                 <input type="text" id="furnRoom" placeholder="e.g., Living Room" required />
-              </div>
-              <div class="form-group">
-                <label for="furnUrl">Product Link URL</label>
-                <input type="url" id="furnUrl" placeholder="https://..." />
               </div>
             </div>
             <button type="submit" class="btn-primary">Add to Home Curation</button>
@@ -583,223 +609,4 @@
             pants: [], blazers: [], shoes: [],
             fragrance: [{ name: "Tom Ford Private Blend", brand: "Tom Ford", url: "", tags: ["Leather"] }],
             sweaters: [{ name: "Charcoal Grey Quarter-Zip", brand: "Isaia", url: "", tags: ["Fine Knit"] }],
-            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli", url: "", tags: ["Outerwear"] }],
-            gifts: [{ name: "Vintage Driver Sunglasses", brand: "Persol", url: "", tags: ["Gift Idea"] }]
-          }
-        },
-        krystin: {
-          name: "Krystin's Archive",
-          categories: {
-            shirts: [], jackets: [], pants: [],
-            blazers: [{ name: "Ribbed Knit Blazer", brand: "Gran Sasso", url: "", tags: ["Black Merino"] }],
-            shoes: [],
-            fragrance: [{ name: "Ojai Eau de Parfum", brand: "L'Objet", url: "", tags: ["100ml"] }],
-            sweaters: [], watches: [],
-            gifts: [{ name: "Rose Noire de Parfum", brand: "L'Objet", url: "", tags: ["Gift Idea"] }]
-          }
-        },
-        kids: {
-          name: "Kids' Archive",
-          categories: {
-            shirts: [], jackets: [], pants: [], blazers: [], shoes: [], fragrance: [], sweaters: [], watches: [],
-            gifts: [{ name: "Custom Travel Map Placemats", brand: "Custom", url: "", tags: ["Travel"] }]
-          }
-        }
-      },
-      furniture: [
-        { name: "Custom Built-in Closets", brand: "Architectural Millwork", room: "Master Suite", url: "", tags: ["Wood Paneling"] }
-      ]
-    };
-
-    let archiveData = JSON.parse(localStorage.getItem('maisonArchive')) || defaultArchive;
-
-    function saveArchive() {
-      localStorage.setItem('maisonArchive', JSON.stringify(archiveData));
-    }
-
-    function handleLogin(event) {
-      event.preventDefault();
-      const val = document.getElementById('passphraseInput').value.trim();
-      if (val === FAMILY_PASSPHRASE) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
-        sessionStorage.setItem('isLoggedIn', 'true');
-      } else {
-        document.getElementById('errorMsg').style.display = 'block';
-        document.getElementById('passphraseInput').value = '';
-      }
-    }
-
-    window.onload = function() {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
-      }
-    };
-
-    function switchView(viewName) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
-      if (viewName === 'home') {
-        document.getElementById('view-home').classList.add('active');
-      } else if (viewName === 'home-furniture') {
-        document.getElementById('view-furniture').classList.add('active');
-        renderFurniture();
-      }
-    }
-
-    function openProfile(profileKey) {
-      currentProfile = profileKey;
-      const profile = archiveData.profiles[profileKey];
-      document.getElementById('profile-heading').innerText = profile.name;
-      document.getElementById('form-owner-label').innerText = profile.name;
-
-      const categories = [
-        { key: 'shirts', label: 'Shirts' },
-        { key: 'jackets', label: 'Jackets' },
-        { key: 'pants', label: 'Pants' },
-        { key: 'blazers', label: 'Blazers' },
-        { key: 'shoes', label: 'Shoes' },
-        { key: 'fragrance', label: 'Fragrance' },
-        { key: 'sweaters', label: 'Sweaters' },
-        { key: 'watches', label: 'Watches & Acc.' },
-        { key: 'gifts', label: 'Gift Ideas' }
-      ];
-
-      const subTabsContainer = document.getElementById('profile-sub-tabs');
-      subTabsContainer.innerHTML = '';
-      categories.forEach((cat, index) => {
-        const btn = document.createElement('button');
-        btn.className = `sub-tab-btn ${index === 0 ? 'active' : ''}`;
-        btn.innerText = cat.label;
-        btn.onclick = () => {
-          document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentCategory = cat.key;
-          renderProfileItems();
-        };
-        subTabsContainer.appendChild(btn);
-      });
-
-      currentCategory = categories[0].key;
-      renderProfileItems();
-
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById('view-profile').classList.add('active');
-    }
-
-    function smartAutoDetect() {
-      const name = document.getElementById('itemName').value.toLowerCase();
-      const url = document.getElementById('itemUrl').value.toLowerCase();
-      const combined = name + " " + url;
-      const select = document.getElementById('itemCategory');
-      const notice = document.getElementById('autoNotice');
-
-      let detected = null;
-
-      if (/shirt|polo|tee|top|button-down|oxford/i.test(combined)) detected = 'shirts';
-      else if (/jacket|puffer|coat|outerwear|windbreaker/i.test(combined)) detected = 'jackets';
-      else if (/pant|trousers|jean|chino|denim|shorts/i.test(combined)) detected = 'pants';
-      else if (/blazer|sportcoat|suit/i.test(combined)) detected = 'blazers';
-      else if (/shoe|boot|loafer|sneaker|footwear|oxford|ghillie/i.test(combined)) detected = 'shoes';
-      else if (/fragrance|perfume|cologne|scent|eau|parfum|edp|edt/i.test(combined)) detected = 'fragrance';
-      else if (/sweater|knit|cardigan|pullover|quarter-zip|cashmere/i.test(combined)) detected = 'sweaters';
-      else if (/watch|belt|bag|accessory|sunglasses|wallet|scarf|tie/i.test(combined)) detected = 'watches';
-      else if (/gift|present|wishlist|idea/i.test(combined)) detected = 'gifts';
-
-      if (detected) {
-        select.value = detected;
-        notice.innerText = `✨ Auto-detected category: ${detected.toUpperCase()}`;
-      } else {
-        notice.innerText = `✨ Smart-categorizing based on text & URL`;
-      }
-    }
-
-    function renderProfileItems() {
-      const grid = document.getElementById('profile-product-grid');
-      grid.innerHTML = '';
-      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
-
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-
-        card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand}</div>
-            <div class="tags-container">${tagsHtml}</div>
-          </div>
-          ${linkHtml}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function renderFurniture() {
-      const grid = document.getElementById('furniture-product-grid');
-      grid.innerHTML = '';
-      const items = archiveData.furniture || [];
-
-      if (items.length === 0) {
-        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
-        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
-
-        card.innerHTML = `
-          <div>
-            <h4>${item.name}</h4>
-            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
-            <div class="tags-container">${tagsHtml}</div>
-          </div>
-          ${linkHtml}
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function handleAddItem(event) {
-      event.preventDefault();
-      const category = document.getElementById('itemCategory').value;
-      const name = document.getElementById('itemName').value;
-      const brand = document.getElementById('itemBrand').value;
-      const url = document.getElementById('itemUrl').value;
-
-      const newItem = { name, brand, url, tags: [brand] };
-      archiveData.profiles[currentProfile].categories[category].push(newItem);
-      saveArchive();
-      renderProfileItems();
-      document.getElementById('addItemForm').reset();
-      document.getElementById('autoNotice').innerText = `✨ Smart-categorizing based on text & URL`;
-    }
-
-    function handleAddFurniture(event) {
-      event.preventDefault();
-      const name = document.getElementById('furnName').value;
-      const brand = document.getElementById('furnMaker').value;
-      const room = document.getElementById('furnRoom').value;
-      const url = document.getElementById('furnUrl').value;
-
-      const newFurn = { name, brand, room, url, tags: [room] };
-      archiveData.furniture.push(newFurn);
-      saveArchive();
-      renderFurniture();
-      document.getElementById('addFurnitureForm').reset();
-    }
-  </script>
-</body>
-</html>
+            watches: [{ name: "Suede-Yoke Puffer Vest", brand: "Brunello Cucinelli
