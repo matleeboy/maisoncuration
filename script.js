@@ -1,3 +1,4 @@
+const API_BASE = 'https://maisoncuration.vercel.app/api';
 const FAMILY_PASSPHRASE = "Porsche";
 let currentProfile = 'mat';
 let currentCategory = 'shirts';
