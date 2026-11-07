@@ -515,22 +515,22 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
-        <!-- Add Item Form (Link-First Auto Extraction) -->
+        <!-- Add Item Form (Smart Brand Extraction) -->
         <div class="add-section">
           <h3>Add Item via Link to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
             <div class="form-grid">
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label for="itemUrl">Product Link URL (Paste here first)</label>
-                <input type="url" id="itemUrl" placeholder="https://www.brand.com/product-page" required oninput="smartExtractFromLink()" />
-                <span class="auto-notice" id="autoNotice">✨ Paste a link and details will be extracted automatically</span>
+                <input type="url" id="itemUrl" placeholder="https://poshmark.com/listing/..." required oninput="smartExtractFromLink()" />
+                <span class="auto-notice" id="autoNotice">✨ Paste a link and brand/item will be extracted automatically</span>
               </div>
               <div class="form-group">
-                <label for="itemBrand">Brand / Designer (Auto-Filled)</label>
+                <label for="itemBrand">Brand / Designer (Smart-Detected)</label>
                 <input type="text" id="itemBrand" placeholder="Extracted brand..." required />
               </div>
               <div class="form-group">
-                <label for="itemName">Item Name / Description (Auto-Filled)</label>
+                <label for="itemName">Item Name / Description (Smart-Detected)</label>
                 <input type="text" id="itemName" placeholder="Extracted item title..." required />
               </div>
               <div class="form-group">
@@ -646,22 +646,27 @@
     function handleLogin(event) {
       event.preventDefault();
       const val = document.getElementById('passphraseInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      
       if (val === FAMILY_PASSPHRASE) {
+        localStorage.setItem('maisonAuth', 'unlocked');
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
-        sessionStorage.setItem('isLoggedIn', 'true');
       } else {
-        document.getElementById('errorMsg').style.display = 'block';
+        errorMsg.style.display = 'block';
         document.getElementById('passphraseInput').value = '';
       }
     }
 
-    window.onload = function() {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('maisonAuth') === 'unlocked') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
+      } else {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-content').style.display = 'none';
       }
-    };
+    });
 
     function switchView(viewName) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -715,46 +720,66 @@
       document.getElementById('view-profile').classList.add('active');
     }
 
-    // Smart Link Extraction & Auto-Categorization Engine
+    // Smart Brand & Item Extraction Engine (Scans Resale / URL Slugs for Designer Names)
     function smartExtractFromLink() {
       const urlInput = document.getElementById('itemUrl').value.trim();
       if (!urlInput) return;
 
       try {
         const urlObj = new URL(urlInput);
-        const hostname = urlObj.hostname.replace('www.', '');
+        const fullUrl = urlInput.toLowerCase();
         const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-        
-        // Extract a clean brand name from domain
-        let guessedBrand = hostname.split('.')[0];
-        guessedBrand = guessedBrand.charAt(0).toUpperCase() + guessedBrand.slice(1);
 
-        // Extract product name from URL path slugs
+        // Dictionary of luxury brands to look for inside resale URLs
+        const luxuryBrands = [
+          "brunello cucinelli", "gran sasso", "isaia", "tom ford", "massimo dutti", 
+          "l'objet", "fedeli", "eleventy", "boggi", "distretto 12", "massimo alba",
+          "herman miller", "persol", "ralph lauren", "burberry", "zegna", "loro piana",
+          "canali", "brioni", "kiton", "barbour", "bottega veneta", "gucci", "prada"
+        ];
+
+        let foundBrand = "";
+        for (let brand of luxuryBrands) {
+          if (fullUrl.includes(brand)) {
+            // Capitalize nicely
+            foundBrand = brand.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            break;
+          }
+        }
+
+        // Fallback to first meaningful slug if brand isn't in our dictionary
+        if (!foundBrand) {
+          let candidate = pathSegments.find(seg => !['listing', 'p', 'product', 'item', 'buy', 'shop'].includes(seg));
+          foundBrand = candidate ? candidate.replace(/[-_]+/g, ' ').split(' ')[0] : "Curated Brand";
+          foundBrand = foundBrand.charAt(0).toUpperCase() + foundBrand.slice(1);
+        }
+
+        // Extract item name from slug
         let guessedName = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Curated Item";
         guessedName = guessedName.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '');
-        guessedName = guessedName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        // Clean up common URL noise words
+        guessedName = guessedName.replace(/men|women|size|l|m|s|xl|listing/gi, '');
+        guessedName = guessedName.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        if (!guessedName) guessedName = "Luxury Apparel Piece";
 
-        document.getElementById('itemBrand').value = guessedBrand;
+        document.getElementById('itemBrand').value = foundBrand;
         document.getElementById('itemName').value = guessedName;
 
-        // Auto-detect category from entire URL
-        const fullUrl = urlInput.toLowerCase();
+        // Auto-detect category
         let detected = 'shirts';
         if (/shirt|polo|tee|top|button/i.test(fullUrl)) detected = 'shirts';
-        else if (/jacket|puffer|coat|outerwear/i.test(fullUrl)) detected = 'jackets';
+        else if (/jacket|puffer|coat|outerwear|vest/i.test(fullUrl)) detected = 'jackets';
         else if (/pant|trousers|jean|chino|denim/i.test(fullUrl)) detected = 'pants';
         else if (/blazer|sportcoat|suit/i.test(fullUrl)) detected = 'blazers';
         else if (/shoe|boot|loafer|sneaker|footwear|ghillie/i.test(fullUrl)) detected = 'shoes';
         else if (/fragrance|perfume|cologne|scent|eau|parfum/i.test(fullUrl)) detected = 'fragrance';
         else if (/sweater|knit|cardigan|pullover|quarter/i.test(fullUrl)) detected = 'sweaters';
-        else if (/watch|belt|bag|accessory|sunglasses|wallet/i.test(fullUrl)) detected = 'watches';
+        else if (/watch|belt|bag|accessory|sunglasses|wallet|vest/i.test(fullUrl)) detected = 'watches';
         else if (/gift|present|wishlist/i.test(fullUrl)) detected = 'gifts';
 
         document.getElementById('itemCategory').value = detected;
-        document.getElementById('autoNotice').innerText = `✨ Successfully extracted from link & categorized as ${detected.toUpperCase()}`;
-      } catch (e) {
-        // Fallback if URL is incomplete while typing
-      }
+        document.getElementById('autoNotice').innerText = `✨ Detected Brand: ${foundBrand} | Category: ${detected.toUpperCase()}`;
+      } catch (e) {}
     }
 
     function smartExtractFurniture() {
@@ -848,7 +873,7 @@
       saveArchive();
       renderProfileItems();
       document.getElementById('addItemForm').reset();
-      document.getElementById('autoNotice').innerText = `✨ Paste a link and details will be extracted automatically`;
+      document.getElementById('autoNotice').innerText = `✨ Paste a link and brand/item will be extracted automatically`;
     }
 
     function handleAddFurniture(event) {
