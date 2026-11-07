@@ -11,7 +11,7 @@
       --card-border: #232730;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --accent: #c5a880; /* Refined luxury champagne gold */
+      --accent: #c5a880;
       --accent-hover: #d8bc94;
       --input-bg: #1a1d24;
       --radius: 8px;
@@ -26,7 +26,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Login Screen Overlay */
     #login-screen {
       position: fixed;
       top: 0;
@@ -110,12 +109,10 @@
       display: none;
     }
 
-    /* Main App Container */
     #app-content {
       display: none;
     }
 
-    /* Shopify-style Header / Navigation */
     header {
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--card-border);
@@ -166,7 +163,6 @@
       padding: 3rem 2rem;
     }
 
-    /* Views System */
     .view {
       display: none;
     }
@@ -174,7 +170,6 @@
       display: block;
     }
 
-    /* Hero Banner for Home */
     .hero-banner {
       text-align: center;
       padding: 4rem 1rem 5rem 1rem;
@@ -196,7 +191,6 @@
       line-height: 1.6;
     }
 
-    /* Shopify Collection Grid (Home Profiles) */
     .collection-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -253,7 +247,6 @@
       font-weight: 500;
     }
 
-    /* Profile View Sub-Navigation Tabs */
     .profile-header {
       display: flex;
       justify-content: space-between;
@@ -298,7 +291,6 @@
       border-color: var(--accent);
     }
 
-    /* Product Grid & Cards */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -366,7 +358,6 @@
       text-decoration: underline;
     }
 
-    /* Add Item Form Section */
     .add-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -437,12 +428,6 @@
 
     .btn-primary:hover {
       background: var(--accent-hover);
-    }
-
-    @media (max-width: 768px) {
-      header { padding: 1rem; }
-      .container { padding: 1.5rem 1rem; }
-      .hero-banner h1 { font-size: 2rem; }
     }
   </style>
 </head>
@@ -515,7 +500,6 @@
 
         <div class="product-grid" id="profile-product-grid"></div>
 
-        <!-- Add Item Form (Optimized Smart Extraction) -->
         <div class="add-section">
           <h3>Add Item via Link to <span id="form-owner-label">Profile</span></h3>
           <form id="addItemForm" onsubmit="handleAddItem(event)">
@@ -658,7 +642,14 @@
       }
     }
 
+    // Bulletproof Load Logic: Checks state immediately without blocking
     window.addEventListener('DOMContentLoaded', () => {
+      // Emergency reset check: if URL has ?reset=true, clears auth loop instantly
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('reset') === 'true') {
+        localStorage.removeItem('maisonAuth');
+      }
+
       if (localStorage.getItem('maisonAuth') === 'unlocked') {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
@@ -720,7 +711,7 @@
       document.getElementById('view-profile').classList.add('active');
     }
 
-    // Highly Optimized Smart Extraction Engine
+    // Smart Extraction Engine
     function smartExtractFromLink() {
       const urlInput = document.getElementById('itemUrl').value.trim();
       if (!urlInput) return;
@@ -728,7 +719,177 @@
       try {
         const fullUrl = urlInput.toLowerCase();
         
-        // Comprehensive Luxury & Tailoring Brand Dictionary
         const luxuryBrands = [
           "brunello cucinelli", "gran sasso", "isaia", "tom ford", "massimo dutti", 
           "l'objet", "fedeli", "eleventy", "boggi", "distretto 12", "massimo alba",
+          "herman miller", "persol", "ralph lauren", "burberry", "zegna", "loro piana",
+          "canali", "brioni", "kiton", "barbour", "bottega veneta", "gucci", "prada",
+          "brunello", "cucinelli"
+        ];
+
+        let foundBrand = "";
+        for (let brand of luxuryBrands) {
+          if (fullUrl.includes(brand)) {
+            if (brand === "brunello" || brand === "cucinelli") foundBrand = "Brunello Cucinelli";
+            else {
+              foundBrand = brand.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            }
+            break;
+          }
+        }
+
+        if (!foundBrand) {
+          const urlObj = new URL(urlInput);
+          const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+          const cleanSegments = pathSegments.filter(seg => !['listing', 'p', 'product', 'item', 'buy', 'shop', 'men', 'women', 'l', 'm', 's', 'xl', 'xxl'].includes(seg.toLowerCase()));
+          if (cleanSegments.length > 0) {
+            foundBrand = cleanSegments[0].replace(/[-_]+/g, ' ');
+            foundBrand = foundBrand.charAt(0).toUpperCase() + foundBrand.slice(1);
+          } else {
+            foundBrand = "Curated Brand";
+          }
+        }
+
+        const urlObj = new URL(urlInput);
+        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+        let rawSlug = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Curated Item";
+        
+        rawSlug = rawSlug.replace(/\.\w+$/, '').replace(/[0-9a-f]{16,}/gi, '');
+        let cleanedWords = rawSlug.split(/[-_]+/).filter(word => {
+          const w = word.toLowerCase();
+          return !['men', 'mens', 'women', 'womens', 'sz', 'size', 'l', 'm', 's', 'xl', 'xxl', 'listing', 'item'].includes(w);
+        });
+
+        let guessedName = cleanedWords.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        if (!guessedName || guessedName.length < 3) guessedName = "Luxury Apparel Piece";
+
+        document.getElementById('itemBrand').value = foundBrand;
+        document.getElementById('itemName').value = guessedName;
+
+        let detected = 'shirts';
+        if (/shirt|polo|tee|top|button/i.test(fullUrl)) detected = 'shirts';
+        else if (/jacket|puffer|coat|outerwear|vest/i.test(fullUrl)) detected = 'jackets';
+        else if (/pant|trousers|jean|chino|denim/i.test(fullUrl)) detected = 'pants';
+        else if (/blazer|sportcoat|suit/i.test(fullUrl)) detected = 'blazers';
+        else if (/shoe|boot|loafer|sneaker|footwear|ghillie/i.test(fullUrl)) detected = 'shoes';
+        else if (/fragrance|perfume|cologne|scent|eau|parfum/i.test(fullUrl)) detected = 'fragrance';
+        else if (/sweater|knit|cardigan|pullover|quarter/i.test(fullUrl)) detected = 'sweaters';
+        else if (/watch|belt|bag|accessory|sunglasses|wallet|vest/i.test(fullUrl)) detected = 'watches';
+        else if (/gift|present|wishlist/i.test(fullUrl)) detected = 'gifts';
+
+        document.getElementById('itemCategory').value = detected;
+        document.getElementById('autoNotice').innerText = `✨ Brand: ${foundBrand} | Item: ${guessedName}`;
+      } catch (e) {}
+    }
+
+    function smartExtractFurniture() {
+      const urlInput = document.getElementById('furnUrl').value.trim();
+      if (!urlInput) return;
+
+      try {
+        const urlObj = new URL(urlInput);
+        const hostname = urlObj.hostname.replace('www.', '');
+        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+        
+        let guessedMaker = hostname.split('.')[0];
+        guessedMaker = guessedMaker.charAt(0).toUpperCase() + guessedMaker.slice(1);
+
+        let guessedPiece = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : "Furniture Piece";
+        guessedPiece = guessedPiece.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '');
+        guessedPiece = guessedPiece.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+        document.getElementById('furnMaker').value = guessedMaker;
+        document.getElementById('furnName').value = guessedPiece;
+        document.getElementById('furnRoom').value = "Living Space";
+        document.getElementById('furnAutoNotice').innerText = `✨ Furniture details extracted successfully`;
+      } catch (e) {}
+    }
+
+    function renderProfileItems() {
+      const grid = document.getElementById('profile-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.profiles[currentProfile].categories[currentCategory] || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No items cataloged in this category yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderFurniture() {
+      const grid = document.getElementById('furniture-product-grid');
+      grid.innerHTML = '';
+      const items = archiveData.furniture || [];
+
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No forever home furniture added yet.</p>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const tagsHtml = item.tags ? item.tags.map(t => `<span class="tag">${t}</span>`).join('') : '';
+        const linkHtml = item.url ? `<a href="${item.url}" target="_blank" class="product-link">View Product &rarr;</a>` : '';
+
+        card.innerHTML = `
+          <div>
+            <h4>${item.name}</h4>
+            <div class="product-meta">${item.brand} • Room: ${item.room}</div>
+            <div class="tags-container">${tagsHtml}</div>
+          </div>
+          ${linkHtml}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function handleAddItem(event) {
+      event.preventDefault();
+      const category = document.getElementById('itemCategory').value;
+      const name = document.getElementById('itemName').value;
+      const brand = document.getElementById('itemBrand').value;
+      const url = document.getElementById('itemUrl').value;
+
+      const newItem = { name, brand, url, tags: [brand] };
+      archiveData.profiles[currentProfile].categories[category].push(newItem);
+      saveArchive();
+      renderProfileItems();
+      document.getElementById('addItemForm').reset();
+      document.getElementById('autoNotice').innerText = `✨ Paste any Poshmark, eBay, or brand link for instant extraction`;
+    }
+
+    function handleAddFurniture(event) {
+      event.preventDefault();
+      const name = document.getElementById('furnName').value;
+      const brand = document.getElementById('furnMaker').value;
+      const room = document.getElementById('furnRoom').value;
+      const url = document.getElementById('furnUrl').value;
+
+      const newFurn = { name, brand, room, url, tags: [room] };
+      archiveData.furniture.push(newFurn);
+      saveArchive();
+      renderFurniture();
+      document.getElementById('addFurnitureForm').reset();
+      document.getElementById('furnAutoNotice').innerText = `✨ Paste a link to auto-extract details`;
+    }
+  </script>
+</body>
+</html>
